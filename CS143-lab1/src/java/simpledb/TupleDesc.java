@@ -35,6 +35,8 @@ public class TupleDesc implements Serializable {
         }
     }
 
+    private final list<TDItem> tdItemList = new ArrayList<TDItem>();
+
     /**
      * @return
      *        An iterator which iterates over all the field TDItems
@@ -42,7 +44,7 @@ public class TupleDesc implements Serializable {
      * */
     public Iterator<TDItem> iterator() {
         // some code goes here
-        return null;
+	return this.tdItemList.iterator();
     }
 
     private static final long serialVersionUID = 1L;
@@ -60,6 +62,12 @@ public class TupleDesc implements Serializable {
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
         // some code goes here
+	if (typeAr.length != fieldAr.length){
+		throw new RuntimeException("lengths don't match");
+	}
+	for (int i = 0; i < typeAr.length; i++){
+		tdItemList.add(new TDItem(typeAr[i], fieldAr[i]));
+	}
     }
 
     /**
@@ -79,7 +87,7 @@ public class TupleDesc implements Serializable {
      */
     public int numFields() {
         // some code goes here
-        return 0;
+	return this.tdItemlist.size();
     }
 
     /**
