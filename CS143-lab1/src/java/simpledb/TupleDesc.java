@@ -201,16 +201,16 @@ public class TupleDesc implements Serializable {
      */
     public boolean equals(Object o) {
         // some code goes here
-
+	TupleDesc td = (TupleDesc)o;
 	// check the TupleDescs size
-	if (o.getSize() != this.getSize())
+	if (td.getSize() != this.getSize())
 		return false;
 
 	// check if all types are equal
-	if (o.numFields() != this.numFields())
+	if (td.numFields() != this.numFields())
 		return false;
 	for (int i = 0; i < this.numFields(); i++){
-		if (o.getFieldType(i) != this.getFieldType(i))
+		if (td.getFieldType(i) != this.getFieldType(i))
 			return false;
 	}
 
