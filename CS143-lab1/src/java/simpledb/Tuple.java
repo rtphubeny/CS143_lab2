@@ -13,6 +13,11 @@ public class Tuple implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //class variables
+    private TupleDesc _TupleDesc;
+    private RecordId _RecordId;
+    private Field[] _Fields;
+
     /**
      * Create a new tuple with the specified schema (type).
      * 
@@ -22,6 +27,10 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         // some code goes here
+	// set tuple desc
+	this._TupleDesc = td;
+	//initialize fields array
+	this._Fields = new Field[td.numFields()];
     }
 
     /**
@@ -29,7 +38,7 @@ public class Tuple implements Serializable {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+	return this._TupleDesc;
     }
 
     /**
@@ -38,7 +47,7 @@ public class Tuple implements Serializable {
      */
     public RecordId getRecordId() {
         // some code goes here
-        return null;
+        return this._RecordId;
     }
 
     /**
@@ -49,6 +58,7 @@ public class Tuple implements Serializable {
      */
     public void setRecordId(RecordId rid) {
         // some code goes here
+	this._RecordId = rid;
     }
 
     /**
@@ -61,6 +71,7 @@ public class Tuple implements Serializable {
      */
     public void setField(int i, Field f) {
         // some code goes here
+	this._Fields[i] = f;
     }
 
     /**
@@ -71,7 +82,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        return null;
+        return this._Fields[i];
     }
 
     /**
@@ -84,7 +95,16 @@ public class Tuple implements Serializable {
      */
     public String toString() {
         // some code goes here
-        throw new UnsupportedOperationException("Implement this");
+	String s = "";
+	for (int i = 0; i < this._TupleDesc.numFields(); i++){
+		if (i != 0){
+			s += "\t";
+		}
+		s += this._Fields[i].toString();
+	}
+	s += "\n";
+        //throw new UnsupportedOperationException("Implement this");
+	return s;
     }
     
     /**
@@ -94,7 +114,7 @@ public class Tuple implements Serializable {
     public Iterator<Field> fields()
     {
         // some code goes here
-        return null;
+        return this._Fields.iterator();
     }
     
     /**
