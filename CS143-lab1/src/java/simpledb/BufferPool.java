@@ -27,7 +27,7 @@ public class BufferPool {
     public static final int DEFAULT_PAGES = 50;
 
     private final int max_num_pages;
-    private final ConcurrentMap<Integer, Page> Pages = new ConcurrentHashMap<Integer, Page>();
+    private final ConcurrentHashMap<Integer, Page> Pages = new ConcurrentHashMap<Integer, Page>();
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -68,7 +68,7 @@ public class BufferPool {
         // some code goes here
 	// if in buffer pool
 	if (Pages.containsKey(pid.hashCode())){
-		return get(pid.hashCode());
+		return Pages.get(pid.hashCode());
 	}
 	// if buffer pool not full
 	else if (Pages.size() < this.max_num_pages){
