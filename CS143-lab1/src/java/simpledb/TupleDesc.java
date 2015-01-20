@@ -35,7 +35,7 @@ public class TupleDesc implements Serializable {
         }
     }
 
-    private final list<TDItem> tdItemList = new ArrayList<TDItem>();
+    private final List<TDItem> tdItemList = new ArrayList<TDItem>();
 
     /**
      * @return
@@ -81,7 +81,7 @@ public class TupleDesc implements Serializable {
     public TupleDesc(Type[] typeAr) {
         // some code goes here
 	for (int i = 0; i < typeAr.length; i++){
-		tdItemList.add(new TDItem(typeAr[i]), null);
+		tdItemList.add(new TDItem(typeAr[i], null));
 	}
     }
 
@@ -106,7 +106,7 @@ public class TupleDesc implements Serializable {
         // some code goes here
 	if (i >= this.numFields())
 		throw new NoSuchElementException();
-	return this.tdItemList[i].fieldName;
+	return this.tdItemList.get(i).fieldName;
     }
 
     /**
@@ -123,7 +123,7 @@ public class TupleDesc implements Serializable {
         // some code goes here
 	if (i >= this.numFields())
 		throw new NoSuchElementException();
-        return this.tdItemList[i].fieldType;
+        return this.tdItemList.get(i).fieldType;
     }
 
     /**
@@ -138,7 +138,7 @@ public class TupleDesc implements Serializable {
     public int fieldNameToIndex(String name) throws NoSuchElementException {
         // some code goes here
         for (int i = 0; i < this.numFields(); i++){
-		if (name == this.tdItemList[i].fieldName)
+		if (name == this.tdItemList.get(i).fieldName)
 			return i;
 	}
 	throw new NoSuchElementException();
@@ -152,7 +152,7 @@ public class TupleDesc implements Serializable {
         // some code goes here
 	int size = 0;
 	for (int i = 0; i < this.numFields(); i++){
-		size += this.tdItemList[i].fieldType.getLen();
+		size += this.tdItemList.get(i).fieldType.getLen();
 	}
         return size;
     }
@@ -234,7 +234,7 @@ public class TupleDesc implements Serializable {
         // some code goes here
 	String s = "";
 	for (int i = 0; i < this.numFields(); i++){
-		s+= this.tdItemList[i].toString();
+		s+= this.tdItemList.get(i).toString();
 		s+= ",";
 	}
         return s;
