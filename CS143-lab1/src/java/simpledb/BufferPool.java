@@ -26,8 +26,28 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
+    public class pageElement{
+	//value of tid with lock or 0 if none
+	private int lock;
+	private Page page;
+	private Permissions perm;
+	public pageElement(int l, Page p, Permissions permissions){
+		this.lock = l;
+		this.page = p;
+		this.perm = permissions;
+	}
+	public Page getPage(){
+		return this.page;
+	}
+	public int getLock(){
+		return this.lock;
+	}
+	public Permissions getPermissions(){
+		return this.perm;
+	}
+    }
     private final int max_num_pages;
-    private final ConcurrentHashMap<Integer, Page> Pages = new ConcurrentHashMap<Integer, Page>();
+    private final ConcurrentHashMap<Integer, pageElement> Pages = new ConcurrentHashMap<Integer, pageElement>();
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -67,22 +87,27 @@ public class BufferPool {
         throws TransactionAbortedException, DbException {
         // some code goes here
 	// if in buffer pool
-	if (Pages.containsKey(pid.hashCode())){
-		return Pages.get(pid.hashCode());
+	if (this.Pages.containsKey(pid.hashCode())){
+		pageElement _pageElement = this.Pages.get(pid.hashCode());
+		// if locked by another transaction
+		if (_pageElement.getLock() > 0)
+			return null;
+		// else
+		else
+			return _pageElement.getPage();
 	}
-	// if buffer pool not full
-	else if (Pages.size() < this.max_num_pages){
-		Page p = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
-		Pages.put(pid.hashCode(), p);
-		return p;
-	}
+
+	// if not in buffer pool
+	// get page and create page element
+	Page _page = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
+	pageElement _pageElement = new pageElement(tid.hashCode(), _page, perm);
+	
 	// if buffer pool full
-	else{
+	if (Pages.size() >= this.max_num_pages)
 		evictPage();
-		Page p = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
-		Pages.put(pid.hashCode(), p);
-		return p;
-	}
+
+	this.Pages.put(pid.hashCode(), _pageElement);
+	return _page;
     }
 
     /**
