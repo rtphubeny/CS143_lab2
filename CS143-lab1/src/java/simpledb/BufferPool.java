@@ -28,22 +28,13 @@ public class BufferPool {
 
     public class pageElement{
 	//value of tid with lock or 0 if none
-	private int lock;
-	private Page page;
-	private Permissions perm;
+	public int lock;
+	public Page page;
+	public Permissions perm;
 	public pageElement(int l, Page p, Permissions permissions){
 		this.lock = l;
 		this.page = p;
 		this.perm = permissions;
-	}
-	public Page getPage(){
-		return this.page;
-	}
-	public int getLock(){
-		return this.lock;
-	}
-	public Permissions getPermissions(){
-		return this.perm;
 	}
     }
     private final int max_num_pages;
@@ -90,16 +81,18 @@ public class BufferPool {
 	if (this.Pages.containsKey(pid.hashCode())){
 		pageElement _pageElement = this.Pages.get(pid.hashCode());
 		// if locked by another transaction
-		if (_pageElement.getLock() > 0)
-			return null;
+		if (_pageElement.lock > 0)
+			throw new TransactionAbortedException();
 		// else
 		else
-			return _pageElement.getPage();
+			return _pageElement.page;
 	}
 
 	// if not in buffer pool
 	// get page and create page element
 	Page _page = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
+	if (_page == null)
+		throw new DbException("page does not exist");
 	pageElement _pageElement = new pageElement(tid.hashCode(), _page, perm);
 	
 	// if buffer pool full
@@ -122,6 +115,11 @@ public class BufferPool {
     public  void releasePage(TransactionId tid, PageId pid) {
         // some code goes here
         // not necessary for lab1|lab2
+	/*
+	if (this.Pages.containsKey(pid.hashCode())){
+		if (this.Pages.get(pid.hashCode()).lock == tid);
+			this.Pages.get(pid.hashCode()).lock = -1;
+	}*/
     }
 
     /**
