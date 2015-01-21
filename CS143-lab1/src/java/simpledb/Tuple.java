@@ -27,10 +27,12 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         // some code goes here
-	// set tuple desc
-	this._TupleDesc = td;
-	//initialize fields array
-	this._Fields = new Field[td.numFields()];
+	if (td != null && td.numFields() > 0){
+		// set tuple desc
+		this._TupleDesc = td;
+		//initialize fields array
+		this._Fields = new Field[td.numFields()];
+	}
     }
 
     /**
@@ -71,7 +73,8 @@ public class Tuple implements Serializable {
      */
     public void setField(int i, Field f) {
         // some code goes here
-	this._Fields[i] = f;
+	if (i < this._TupleDesc.numFields() && i >= 0)
+		this._Fields[i] = f;
     }
 
     /**
@@ -82,7 +85,10 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        return this._Fields[i];
+	if (i < this._TupleDesc.numFields() && i >= 0)
+        	return this._Fields[i];
+	else
+		return null;
     }
 
     /**
@@ -123,5 +129,11 @@ public class Tuple implements Serializable {
     public void resetTupleDesc(TupleDesc td)
     {
         // some code goes here
+	if (td != null && td.numFields() > 0){
+		// set tuple desc
+		this._TupleDesc = td;
+		//initialize fields array
+		this._Fields = new Field[td.numFields()];
+	}
     }
 }
