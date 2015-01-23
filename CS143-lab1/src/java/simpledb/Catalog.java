@@ -88,6 +88,10 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
+        if (CatMap.containsKey(tableid))
+            return CatMap.get(tableid).getFile().getTupleDesc();
+        else
+            throw new NoSuchElementException("no table has this tableid");
         // some code goes here
 	Table t = this.CatMap.get(tableid);
 	if (t != null){
