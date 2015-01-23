@@ -72,9 +72,12 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
 	// some code goes here
-	for (Table i : CatMap.values())
-		if (i.getName() == name)
-			return i.getFile().getId();
+	for (Table i : CatMap.values()){
+		if ((i.getName()).equals(name)){
+			if (i.getFile() != null)
+				return i.getFile().getId();
+		}
+	}
 	throw new NoSuchElementException("table doesn't exist");        
     }
 
@@ -86,7 +89,14 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+	Table t = this.CatMap.get(tableid);
+	if (t != null){
+		DbFile file = t.getFile();
+		if (file != null){
+			return file.getTupleDesc();
+		}
+	}
+	throw new NoSuchElementException("table doesn't exist");
     }
 
     /**
@@ -99,16 +109,14 @@ public class Catalog {
         // some code goes here
 	if (CatMap.containsKey(tableid))
 		return CatMap.get(tableid).getFile();
-	else
-		throw new NoSuchElementException("no such table exists");
+	throw new NoSuchElementException("no such table exists");
     }
 
     public String getPrimaryKey(int tableid) {
 	// some code goes here
 	if (CatMap.containsKey(tableid))
 		return CatMap.get(tableid).getPkey();
-	else
-		throw new NoSuchElementException("no such table exists");        
+	throw new NoSuchElementException("no such table exists");        
     }
 
     public Iterator<Integer> tableIdIterator() {
@@ -120,8 +128,7 @@ public class Catalog {
 	// some code goes here
         if (CatMap.containsKey(id))
 		return CatMap.get(id).getName();
-	else
-		throw new NoSuchElementException("no such table exists");
+	throw new NoSuchElementException("no such table exists");
     }
     
     /** Delete all tables from the catalog */
