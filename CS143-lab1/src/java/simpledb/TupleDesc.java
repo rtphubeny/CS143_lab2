@@ -81,7 +81,7 @@ public class TupleDesc implements Serializable {
     public TupleDesc(Type[] typeAr) {
         // some code goes here
 	for (int i = 0; i < typeAr.length; i++){
-		tdItemList.add(new TDItem(typeAr[i], null));
+		this.tdItemList.add(new TDItem(typeAr[i], null));
 	}
     }
 
@@ -138,7 +138,10 @@ public class TupleDesc implements Serializable {
     public int fieldNameToIndex(String name) throws NoSuchElementException {
         // some code goes here
         for (int i = 0; i < this.numFields(); i++){
-		if (name == this.tdItemList.get(i).fieldName)
+		TDItem tdi = this.tdItemList.get(i);
+		if (tdi != null && tdi.fieldName != null && (tdi.fieldName.equals(name)))
+			return i;
+		if (tdi != null && tdi.fieldName == null && name == null)
 			return i;
 	}
 	throw new NoSuchElementException();
@@ -168,7 +171,12 @@ public class TupleDesc implements Serializable {
      * @return the new TupleDesc
      */
     public static TupleDesc merge(TupleDesc td1, TupleDesc td2) {
-        // some code goes here
+        if (td1 == null)
+		return td2;
+	if (td2 == null)
+		return td1;
+
+	// some code goes here
 	int total_fields = td1.numFields() + td2.numFields();
 	Type[] typeAr = new Type[total_fields];
 	String[] fieldAr = new String[total_fields];
@@ -182,8 +190,8 @@ public class TupleDesc implements Serializable {
 	// add data from td2
 	int fields_1 = td1.numFields();
 	for (int i = fields_1; i < fields_1 + td2.numFields(); i++){
-		typeAr[i] = td2.getFieldType(i);
-		fieldAr[i] = td2.getFieldName(i);
+		typeAr[i] = td2.getFieldType(i - fields_1);
+		fieldAr[i] = td2.getFieldName(i - fields_1);
 	}
 
 	// return new TupleDesc
@@ -201,6 +209,8 @@ public class TupleDesc implements Serializable {
      */
     public boolean equals(Object o) {
         // some code goes here
+	if (o == null)
+		return false;
 	if (o.getClass() != this.getClass()){
 		return false;
 	}
