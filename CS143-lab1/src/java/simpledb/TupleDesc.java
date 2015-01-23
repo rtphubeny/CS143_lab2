@@ -155,7 +155,12 @@ public class TupleDesc implements Serializable {
         // some code goes here
 	int size = 0;
 	for (int i = 0; i < this.numFields(); i++){
-		size += this.tdItemList.get(i).fieldType.getLen();
+		TDItem tdi = this.tdItemList.get(i);
+		if (tdi != null){
+			Type ft = tdi.fieldType;
+			if (ft != null)
+				size += ft.getLen();
+		}
 	}
         return size;
     }
