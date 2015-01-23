@@ -54,7 +54,7 @@ public class RecordId implements Serializable {
 	if (o instanceof RecordId)
 	{
 		RecordId rObj = (RecordId)o;
-		if (rObj.getPageId().equals(this.pageId()) && rObj.tupleno() == this.tupleno)
+		if (rObj.getPageId().equals(this.getPageId()) && rObj.tupleno() == this.tupleno())
 			return true;
 	}
 	return false;       
@@ -69,7 +69,7 @@ public class RecordId implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Integer.parseInt(String.valueOf(this.getPageId().hashCode()) + String.valueOf(this.tupleno));
+        return Integer.parseInt(String.valueOf(this.getPageId().hashCode()) + String.valueOf(this.tupleno()));
 	// some code goes here
     }
 

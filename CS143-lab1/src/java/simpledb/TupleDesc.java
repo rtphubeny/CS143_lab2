@@ -201,6 +201,9 @@ public class TupleDesc implements Serializable {
      */
     public boolean equals(Object o) {
         // some code goes here
+	if (o.getClass() != this.getClass()){
+		return false;
+	}
 	TupleDesc td = (TupleDesc)o;
 	// check the TupleDescs size
 	if (td.getSize() != this.getSize())

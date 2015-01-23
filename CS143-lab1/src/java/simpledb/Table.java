@@ -13,20 +13,23 @@ public class Table {
 	private String m_name;
 	private String m_pkeyField;
 
-	public Table(Dbfile file, String name, String pkeyField)
+	public Table(DbFile file, String name, String pkeyField)
 	{
 		this.m_file = file;
 		this.m_name = name;
 		this.m_pkeyField = pkeyField;
 	}
 
-	public DbFile getFile()
+	public DbFile getFile(){
 		return this.m_file;
+	}
 
-	public String getName()
+	public String getName(){
 		return this.m_name;
+	}
 
-	public String getPkey()
+	public String getPkey(){
 		return this.m_pkeyField;
+	}
 
 }

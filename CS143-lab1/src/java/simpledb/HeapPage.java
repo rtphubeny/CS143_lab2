@@ -2,6 +2,7 @@ package simpledb;
 
 import java.util.*;
 import java.io.*;
+import java.math.BigInteger;
 
 /**
  * Each instance of HeapPage stores data for one page of HeapFiles and 
@@ -281,15 +282,14 @@ public class HeapPage implements Page {
      * Returns the number of empty slots on this page.
      */
     public int getNumEmptySlots() {
+	// some code goes here
 	int emptySlots = 0;
 	for (int i = 0; i < numSlots; i++)
 	{
 		if (!this.isSlotUsed(i))
 			emptySlots++;
 	}
-	return emptyslots;     
-	// some code goes here
-        return 0;
+	return emptySlots;     
     }
 
     /**
@@ -304,7 +304,7 @@ public class HeapPage implements Page {
 		throw new IllegalArgumentException("use a valid byte");
 	byte[] arr = new byte[] {header[tbyte]};
 	BigInteger newarr = new BigInteger(arr);
-	return newarr.testbit(tbit);
+	return newarr.testBit(tbit);
 	// some code goes here
     }
 
@@ -327,10 +327,9 @@ public class HeapPage implements Page {
 		if (isSlotUsed(i))
 			it.add(tuples[i]);
 	}
-	return new HeapPageIterator<Tuple>(it);
-	}        
+	//return new HeapPageIterator<Tuple>(it);
+	return null;
+    }        
 	// some code goes here
-    }
-
 }
 

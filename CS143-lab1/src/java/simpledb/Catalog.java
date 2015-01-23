@@ -43,7 +43,7 @@ public class Catalog {
 		throw new IllegalArgumentException("Name is null");
 	else
 	{
-		if (CatMap.containsKey(tabId)
+		if (CatMap.containsKey(tabId))
 			return;
 		Table new_table = new Table(file, name, pkeyField);
 		CatMap.put(tabId, new_table);
@@ -71,12 +71,11 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
+	// some code goes here
 	for (Table i : CatMap.values())
 		if (i.getName() == name)
 			return i.getFile().getId();
 	throw new NoSuchElementException("table doesn't exist");        
-	// some code goes here
-        return 0;
     }
 
     /**
@@ -97,35 +96,32 @@ public class Catalog {
      *     function passed to addTable
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
+        // some code goes here
 	if (CatMap.containsKey(tableid))
 		return CatMap.get(tableid).getFile();
 	else
 		throw new NoSuchElementException("no such table exists");
-        // some code goes here
-        return null;
     }
 
     public String getPrimaryKey(int tableid) {
+	// some code goes here
 	if (CatMap.containsKey(tableid))
 		return CatMap.get(tableid).getPkey();
 	else
 		throw new NoSuchElementException("no such table exists");        
-	// some code goes here
-        return null;
     }
 
     public Iterator<Integer> tableIdIterator() {
-        return CatMap.keySet().iterator();
 	// some code goes here
+        return CatMap.keySet().iterator();
     }
 
     public String getTableName(int id) {
-        if (CatMap.containsKey(id)
+	// some code goes here
+        if (CatMap.containsKey(id))
 		return CatMap.get(id).getName();
 	else
 		throw new NoSuchElementException("no such table exists");
-	// some code goes here
-        return null;
     }
     
     /** Delete all tables from the catalog */
