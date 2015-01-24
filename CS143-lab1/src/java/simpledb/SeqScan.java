@@ -83,6 +83,7 @@ public class SeqScan implements DbIterator {
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
 	this.it = Database.getCatalog().getDatabaseFile(this._tableID).iterator(this._transactionID);
+	it.open();
     }
 
     /**
@@ -96,12 +97,19 @@ public class SeqScan implements DbIterator {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return Database.getCatalog().getTupleDesc(this._tableID);
+        TupleDesc underlying_td = Database.getCatalog().getTupleDesc(this._tableID);
+	Type[] t = new Type[underlying_td.numFields()];
+	String[] s = new String[underlying_td.numFields()];
+
+	for (int i = 0; i < underlying_td.numFields(); i++){
+		t[i] = underlying_td.getFieldType(i);
+		s[i] = this._tableAlias + underlying_td.getFieldName(i);
+	}
+	return new TupleDesc(t, s);
     }
 
     public boolean hasNext() throws TransactionAbortedException, DbException {
         // some code goes here
- //       return Database.getCatalog().getDatabaseFile(this._tableID).iterator(this._transactionID).hasNext();
 	if (it == null)
 		return false;
 	if (it.hasNext())
@@ -112,24 +120,22 @@ public class SeqScan implements DbIterator {
     public Tuple next() throws NoSuchElementException,
             TransactionAbortedException, DbException {
         // some code goes here
-        //return Database.getCatalog().getDatabaseFile(this._tableID).iterator(this._transactionID).next();
 	if (it == null)
-		throw new NoSuchElementException("tuple is null");
-	if (hasNext())
+		throw new NoSuchElementException("iterator is null");
+	if (it.hasNext())
 		return it.next();
 	throw new NoSuchElementException("no more tuples");
     }
 
     public void close() {
         // some code goes here
-        //Database.getCatalog().getDatabaseFile(this._tableID).iterator(this._transactionID).close();
+	it.close();
 	it = null;
     }
 
     public void rewind() throws DbException, NoSuchElementException,
             TransactionAbortedException {
         // some code goes here
-        //Database.getCatalog().getDatabaseFile(this._tableID).iterator(this._transactionID).rewind();
 	close();
 	open();
     }
