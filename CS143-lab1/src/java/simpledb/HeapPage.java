@@ -327,8 +327,7 @@ public class HeapPage implements Page {
 		if (isSlotUsed(i))
 			it.add(tuples[i]);
 	}
-	return it.iterator();
-	//return new HeapPageIterator<Tuple>(it);
+	return new HeapPageIterator<Tuple>(it);
     }        
 	// some code goes here
 }
