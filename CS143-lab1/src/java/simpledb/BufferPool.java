@@ -81,7 +81,7 @@ public class BufferPool {
 	if (this.Pages.containsKey(pid.hashCode())){
 		pageElement _pageElement = this.Pages.get(pid.hashCode());
 		// if locked by another transaction
-		if (_pageElement.lock > 0)
+		if (_pageElement.lock > 0 && _pageElement.lock != tid.hashCode())
 			throw new TransactionAbortedException();
 		// else
 		else
