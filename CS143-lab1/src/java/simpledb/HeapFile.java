@@ -17,23 +17,6 @@ public class HeapFile implements DbFile {
 
 	File m_file;
 	TupleDesc m_td;
-/*
-	interface HeapFileIterator extends java.util.Iterator<Page>{}
-	private class HeapFileIterator implements DbFileIterator{
-		private int nextIndex = 0;
-		public void open(){
-		}
-		public boolean hasNext(){
-			return ;
-		}
-		public Tuple next(){
-		}
-		public void rewind(){
-		}
-		public void close(){
-		}
-	}
-*/
     /**
      * Constructs a heap file backed by the specified file.
      * 
@@ -91,8 +74,10 @@ public class HeapFile implements DbFile {
 	    RandomAccessFile raf = new RandomAccessFile(m_file, "r");
             int offset = pid.pageNumber()*BufferPool.PAGE_SIZE;
             byte[] arr = new byte[BufferPool.PAGE_SIZE];
-            //raf.seek(offset);
-            raf.read(arr, offset, BufferPool.PAGE_SIZE);
+		if (raf.skipBytes(offset) != offset){
+			throw new IllegalArgumentException();
+		}
+            raf.read(arr, 0, BufferPool.PAGE_SIZE);
             HeapPageId hpId = (HeapPageId) pid;
             raf.close();  
             return new HeapPage(hpId, arr);         
