@@ -13,7 +13,7 @@ public class HeapPageIterator<Tuple> implements Iterator<Tuple>{
     //constructor
     public HeapPageIterator(ArrayList<Tuple> tuples) {
         this.m_tuple = tuples;
-        this.m_it = tuple.iterator();
+        this.m_it = tuples.iterator();
     }
 
     @Override
