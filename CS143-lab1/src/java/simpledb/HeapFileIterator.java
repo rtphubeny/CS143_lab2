@@ -91,7 +91,7 @@ public class HeapFileIterator implements DbFileIterator {
             HeapPage hp = (HeapPage)p;
             Iterator<Tuple> it = hp.iterator();
             while(it.hasNext())
-                tupleList.add(it.next());
+                tuples.add(it.next());
             return  tuples;
         }
 
