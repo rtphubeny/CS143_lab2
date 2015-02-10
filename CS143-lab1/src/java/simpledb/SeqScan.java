@@ -83,7 +83,8 @@ public class SeqScan implements DbIterator {
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
 	this.it = Database.getCatalog().getDatabaseFile(this._tableID).iterator(this._transactionID);
-	it.open();
+	if (it != null)
+		it.open();
     }
 
     /**
@@ -129,8 +130,10 @@ public class SeqScan implements DbIterator {
 
     public void close() {
         // some code goes here
-	it.close();
-	it = null;
+	if (it != null){
+		it.close();
+		it = null;
+	}
     }
 
     public void rewind() throws DbException, NoSuchElementException,
