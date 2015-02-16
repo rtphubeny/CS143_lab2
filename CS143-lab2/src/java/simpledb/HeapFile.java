@@ -74,7 +74,7 @@ public class HeapFile implements DbFile {
 	    RandomAccessFile raf = new RandomAccessFile(m_file, "r");
             int offset = pid.pageNumber()*BufferPool.PAGE_SIZE;
             byte[] arr = new byte[BufferPool.PAGE_SIZE];
-		if (raf.skipBytes(offset) != offset){
+		if (raf.skipBytes(offset) != offset) {  
 			throw new IllegalArgumentException();
 		}
             raf.read(arr, 0, BufferPool.PAGE_SIZE);
@@ -92,6 +92,25 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public void writePage(Page page) throws IOException {
         // some code goes here
+        try {
+            PageId pid = page.getId();
+            HeapPageId hpid = (HeapPageId)pid;
+
+            RandomAccessFile raf = new RandomAccessFile(m_file,"rw");
+            int offset = pid.pageNumber()*BufferPool.PAGE_SIZE;
+            byte[] arr = new byte[BufferPool.PAGE_SIZE];
+            if (raf.skipBytes(offset) != offset) {
+                throw new IllegalArgumentException();
+            }
+
+            arr = page.getPageData();
+            raf.seek(offset);
+            raf.write(arr, 0, BufferPool.PAGE_SIZE);
+            raf.close();          
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
         // not necessary for lab1
     }
 
@@ -107,7 +126,6 @@ public class HeapFile implements DbFile {
     public ArrayList<Page> insertTuple(TransactionId tid, Tuple t)
             throws DbException, IOException, TransactionAbortedException {
         // some code goes here
-        return null;
         // not necessary for lab1
     }
 
@@ -115,7 +133,12 @@ public class HeapFile implements DbFile {
     public ArrayList<Page> deleteTuple(TransactionId tid, Tuple t) throws DbException,
             TransactionAbortedException {
         // some code goes here
-        return null;
+        RecordId rId = t.getRecordId();
+        PageId pId = rId.getPageId();
+        Page p = Database.getBufferPool().getPage(tid, pId, Permissions.READ_WRITE);
+        HeapPage hp = (HeapPage)p;
+        hp.deleteTuple(t);
+        return Database.getBufferPool().getPage(tid, pId, Permissions.READ_ONLY);
         // not necessary for lab1
     }
 

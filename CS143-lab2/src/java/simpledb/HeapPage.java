@@ -247,6 +247,16 @@ public class HeapPage implements Page {
      */
     public void deleteTuple(Tuple t) throws DbException {
         // some code goes here
+        RecordId rId = t.getRecordId();
+
+        if (rId.getPageId() != pid) {
+            throw new DbException("tuple not on page");
+        }
+        if (!isSlotUsed(rId.tupleno())){
+            throw new DbException("slot is empty already");
+        }
+        tuples[rId.tupleno()] = null;
+        markSlotUsed(rId.tupleno(), false);
         // not necessary for lab1
     }
 
@@ -302,7 +312,7 @@ public class HeapPage implements Page {
      * Returns true if associated slot on this page is filled.
      */
     public boolean isSlotUsed(int i) {
-        if (i < 0 || i > numSlots)
+    if (i < 0 || i > numSlots)
 		throw new IllegalArgumentException("use a valid slot number");
 	int tbyte = i/8;
 	int tbit = i%8;
@@ -319,6 +329,19 @@ public class HeapPage implements Page {
      */
     private void markSlotUsed(int i, boolean value) {
         // some code goes here
+        int tbyte = i / 8;
+        int tbit = i % 8;
+        byte[] arr = new byte[] {header[tbyte]};
+        BigInteger bigi = new BigInteger(arr);
+        
+        if (value) {
+            bigi = bigi.setBit(tbit);
+        } else{
+            bigi = bigi.clearBit(tbit);
+        }
+
+        byte [] byteArr = bi.toByteArray();
+        header[tbyte] = byteArr[byteArr.length-1];
         // not necessary for lab1
     }
 
