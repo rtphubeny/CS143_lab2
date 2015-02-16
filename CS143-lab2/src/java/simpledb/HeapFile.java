@@ -100,7 +100,7 @@ public class HeapFile implements DbFile {
      */
     public int numPages() {
         // some code goes here
-        return (int)Math.ceil(m_file.length()/BufferPool.PAGE_SIZE);
+        return (int)Math.ceil(m_file.length()/BufferPool.getPageSize());
     }
 
     // see DbFile.java for javadocs
