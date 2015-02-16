@@ -34,7 +34,7 @@ public class StringAggregator implements Aggregator {
         m_aField = afield;
         m_op = what;
 
-        m_group = new HashMap<Field, Integer>();
+        group = new HashMap<Field, Integer>();
         // some code goes here
     }
 

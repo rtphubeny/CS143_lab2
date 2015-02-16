@@ -359,7 +359,7 @@ public class HeapPage implements Page {
             bigi = bigi.clearBit(tbit);
         }
 
-        byte [] byteArr = bigi.toByteArray();
+        byte [] byteArr = bi.toByteArray();
         header[tbyte] = byteArr[byteArr.length-1];
         // not necessary for lab1
     }

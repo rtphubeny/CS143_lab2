@@ -129,7 +129,7 @@ public class IntegerAggregator implements Aggregator {
 	else {
 		for (Field key : m_group.keySet()) {
 			int val = m_group.get(key);
-			if (m_op == Op.AVG)
+			if (op == Op.AVG)
 				val /= m_count.get(key);
 			Tuple tuple = new Tuple(descriptor);
 			tuple.setField(0, key);
