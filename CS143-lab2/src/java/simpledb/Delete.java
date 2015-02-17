@@ -43,8 +43,8 @@ public class Delete extends Operator {
 
     public void close() {
         // some code goes here
-	super.close();
 	this._child.close();
+	super.close();
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
