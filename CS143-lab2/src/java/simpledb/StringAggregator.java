@@ -1,4 +1,5 @@
 package simpledb;
+import java.util.*;
 
 /**
  * Knows how to compute some aggregate over a set of StringFields.

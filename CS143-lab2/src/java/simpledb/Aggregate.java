@@ -156,7 +156,7 @@ public class Aggregate extends Operator {
      */
     public TupleDesc getTupleDesc() {
 	Type[] fType;
-	String fName;
+	String[] fName;
 
 	if (m_aField == Aggregator.NO_GROUPING) {
 		fType = new Type[1];
