@@ -269,6 +269,25 @@ public class HeapPage implements Page {
      */
     public void insertTuple(Tuple t) throws DbException {
         // some code goes here
+        if (this.getNumEmptySlots() == 0)
+            throw new DbException("no empty slot");
+        if (!t.getTupleDesc().equals(this.td))
+            throw new DbException("tuple desc is a mismatch");
+
+        int slot = -1;
+        for (int i = 0; i < numSlots; i++)
+        { //find first empty slot
+            if (!isSlotUsed(i)) {
+                slot = i;
+                break;
+            }
+        }
+
+        assert slot >= 0;
+
+        tuples[slot] = t; //put tuple into first empty slot
+        markSlotUsed(slot, true);
+        t.setRecordId(new RecordId(pid, slot)); //update rid
         // not necessary for lab1
     }
 

@@ -71,41 +71,41 @@ public class HeapFile implements DbFile {
     public Page readPage(PageId pid) {
         // some code goes here
 	try{
-	    RandomAccessFile raf = new RandomAccessFile(m_file, "r");
+	       RandomAccessFile raf = new RandomAccessFile(m_file, "r");
             int offset = pid.pageNumber()*BufferPool.PAGE_SIZE;
             byte[] arr = new byte[BufferPool.PAGE_SIZE];
-		if (raf.skipBytes(offset) != offset) {  
-			throw new IllegalArgumentException();
-		}
-            raf.read(arr, 0, BufferPool.PAGE_SIZE);
-            HeapPageId hpId = (HeapPageId) pid;
+
+		    if (raf.skipBytes(offset) != offset)  
+			    throw new IllegalArgumentException();
+		    
+            raf.read(arr, 0, BufferPool.PAGE_SIZE);  //read page
             raf.close();  
-            return new HeapPage(hpId, arr);         
+            return new HeapPage((HeapPageId)pid, arr);         
         }
             catch (IOException e)
             {
                 e.printStackTrace();
             }
-        throw new IllegalArgumentException();
+            throw new IllegalArgumentException();
     }
 
     // see DbFile.java for javadocs
     public void writePage(Page page) throws IOException {
         // some code goes here
         try {
-            PageId pid = page.getId();
-            HeapPageId hpid = (HeapPageId)pid;
+            PageId pid = page.getId();  //get page id
 
-            RandomAccessFile raf = new RandomAccessFile(m_file,"rw");
+            RandomAccessFile raf = new RandomAccessFile(m_file,"rw"); //create new heap file
             int offset = pid.pageNumber()*BufferPool.PAGE_SIZE;
-            byte[] arr = new byte[BufferPool.PAGE_SIZE];
+            byte[] arr = new byte[BufferPool.PAGE_SIZE]; //byte array to hold data
+
             if (raf.skipBytes(offset) != offset) {
                 throw new IllegalArgumentException();
             }
 
-            arr = page.getPageData();
+            arr = page.getPageData(); //add preexisiting data to page
             raf.seek(offset);
-            raf.write(arr, 0, BufferPool.PAGE_SIZE);
+            raf.write(arr, 0, BufferPool.PAGE_SIZE); //write data to correct place in page
             raf.close();          
         }
         catch (IOException e){
