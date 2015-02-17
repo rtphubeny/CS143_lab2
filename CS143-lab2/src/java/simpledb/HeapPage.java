@@ -70,7 +70,7 @@ public class HeapPage implements Page {
     */
     private int getNumTuples() {        
         // some code goes here
-        return (int)Math.floor((BufferPool.PAGE_SIZE*8)/(td.getSize()*8+1));
+        return (int)Math.floor((BufferPool.getPageSize()*8)/(td.getSize()*8+1));
 
     }
 
@@ -81,7 +81,7 @@ public class HeapPage implements Page {
     private int getHeaderSize() {        
         
         // some code goes here
-        return (int)Math.ceil(this.numSlots/8.0);
+        return (int)Math.ceil(this.getNumTuples()/8.0);
                  
     }
     
@@ -247,16 +247,19 @@ public class HeapPage implements Page {
      */
     public void deleteTuple(Tuple t) throws DbException {
         // some code goes here
-        int pos = t.getRecordId().tupleno();
-
-        if (t.getRecordId().getPageId() != pid)
+	if (t.getRecordId() == null)
+		throw new DbException("tuple has no record id");
+        if (!t.getRecordId().getPageId().equals(pid))
             throw new DbException("tuple not on page");
+
+        int pos = t.getRecordId().tupleno();
 
         if (!isSlotUsed(pos))
             throw new DbException("slot is empty already");
     
         tuples[pos] = null;     //null the spot where we are deleting the tuple
         markSlotUsed(pos, false);   //mark it as not used
+	t.setRecordId(null);
         // not necessary for lab1
     }
 

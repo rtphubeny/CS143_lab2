@@ -107,6 +107,8 @@ public class Predicate implements Serializable {
 	if (t == null)
 		return false;
         Field f = t.getField(this._field);
+	if (f == null)
+		return false;
 	return f.compare(this._op, _operand);
     }
 

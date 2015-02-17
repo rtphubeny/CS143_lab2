@@ -84,9 +84,9 @@ public class BufferPool {
 	if (this.Pages.containsKey(pid.hashCode())){
 		pageElement _pageElement = this.Pages.get(pid.hashCode());
 		// if locked by another transaction
-		if (_pageElement.lock > 0 && _pageElement.lock != tid.hashCode())
-			throw new TransactionAbortedException();
-		else
+	//	if (_pageElement.lock > 0 && _pageElement.lock != tid.hashCode())
+	//		throw new TransactionAbortedException();
+	//	else
 			return _pageElement.page;
 	}
 
@@ -263,6 +263,7 @@ public class BufferPool {
 			} catch (IOException e) {}
 		}
 		Pages.remove(pe.pe_pid.hashCode());
+		break;
 	}
     }
 

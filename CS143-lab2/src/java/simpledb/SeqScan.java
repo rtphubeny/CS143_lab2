@@ -104,7 +104,7 @@ public class SeqScan implements DbIterator {
 
 	for (int i = 0; i < underlying_td.numFields(); i++){
 		t[i] = underlying_td.getFieldType(i);
-		s[i] = this._tableAlias + underlying_td.getFieldName(i);
+		s[i] = this._tableAlias + "." + underlying_td.getFieldName(i);
 	}
 	return new TupleDesc(t, s);
     }

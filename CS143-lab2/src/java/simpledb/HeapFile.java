@@ -159,16 +159,20 @@ public class HeapFile implements DbFile {
     public ArrayList<Page> deleteTuple(TransactionId tid, Tuple t) throws DbException,
             TransactionAbortedException {
         // some code goes here
-        RecordId rId = t.getRecordId();
-        PageId pId = rId.getPageId();
-        Page p = Database.getBufferPool().getPage(tid, pId, Permissions.READ_WRITE);
-        HeapPage hp = (HeapPage)p;
-        hp.deleteTuple(t);
+	if (t.getRecordId() != null && t.getRecordId().getPageId().getTableId() == this.getId()){
+		RecordId rId = t.getRecordId();
+        	PageId pId = rId.getPageId();
+        	Page p = m_bufferPool.getPage(tid, pId, Permissions.READ_WRITE);
+        	HeapPage hp = (HeapPage)p;
+        	hp.deleteTuple(t);
+		hp.markDirty(true, tid);
 	
-	ArrayList<Page> updatedPages = new ArrayList<Page>();
-	updatedPages.add(Database.getBufferPool().getPage(tid, pId, Permissions.READ_ONLY));
+		ArrayList<Page> updatedPages = new ArrayList<Page>();
+		updatedPages.add(hp);
         
-        return updatedPages;
+        	return updatedPages;
+	}
+	throw new DbException("problem deleting tuple");
         // not necessary for lab1
     }
 
