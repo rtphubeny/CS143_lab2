@@ -12,9 +12,6 @@ public class Join extends Operator {
     private DbIterator _child1;
     private DbIterator _child2;
     private Tuple t1;
-    private Tuple t2;
-	private Tuple leftTuple;
-	private Tuple rightTuple;
 
     /**
      * Constructor. Accepts to children to join and the predicate to join them
@@ -75,9 +72,6 @@ public class Join extends Operator {
 	this._child2.open();
 	super.open();
 	this.t1 = null;
-	this.t2 = null;
-	leftTuple = null;
-	rightTuple = null;
     }
 
     public void close() {
@@ -86,19 +80,12 @@ public class Join extends Operator {
 	this._child1.close();
 	this._child2.close();
 	this.t1 = null;
-	this.t2 = null;
-	leftTuple = null;
-	rightTuple = null;
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
         // some code goes here
-	this._child1.rewind();
-	this._child2.rewind();
-	this.t1 = null;
-	this.t2 = null;
-	leftTuple = null;
-	rightTuple = null;
+	close();
+	open();
     }
 
     /**
@@ -121,46 +108,37 @@ public class Join extends Operator {
      */
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
         // some code goes here
-	if (this.t1 == null){ //there are no elements in _child1
-		if(!this._child1.hasNext())
-			return null;
-	}
-	while(this._child1.hasNext()){
-		if (this.t1 == null && this.t2 == null)
-			this.t1 = this._child1.next();
+	if (t1 == null && !this._child1.hasNext())
+		return null;
+
+	while(t1 != null || this._child1.hasNext()){
+		while (t1 == null && this._child1.hasNext()){
+			t1 = this._child1.next();
+			this._child2.rewind();
+		}
 		while(this._child2.hasNext()){
-			this.t2 = this._child2.next();
-			if (this._jp.filter(this.t1, this.t2)){
+			Tuple t2 = this._child2.next();
+			if (this._jp.filter(this.t1, t2)){
 				Tuple t = new Tuple(this.getTupleDesc());
-				int t1size = this.t1.getTupleDesc().numFields();
+				int t1size = t1.getTupleDesc().numFields();
 				int i = 0;
 				for (; i < t1size; i++){
-					t.setField(i, this.t1.getField(i));
+					t.setField(i, t1.getField(i));
 				}
 				for (; i < this.getTupleDesc().numFields(); i++){
-					t.setField(i, this.t2.getField(i-t1size));
+					t.setField(i, t2.getField(i-t1size));
 				}
 				return t;
 			}
 		}
-		this.t1 = _child1.next();
-		this._child2.rewind();
-	}
-	while(this._child2.hasNext()){
-		this.t2 = this._child2.next();
-		if (this._jp.filter(this.t1, this.t2)){
-			Tuple t = new Tuple(this.getTupleDesc());
-			int t1size = this.t1.getTupleDesc().numFields();
-			int i = 0;
-			for (; i < t1size; i++){
-				t.setField(i, t1.getField(i));
-			}
-			for (; i < this.getTupleDesc().numFields(); i++){
-				t.setField(i, t2.getField(i-t1size));
-			}
-			return t;
+		if (this._child1.hasNext()){
+			this.t1 = this._child1.next();
+			this._child2.rewind();
 		}
+		else
+			return null;
 	}
+
         return null;
     }
 
