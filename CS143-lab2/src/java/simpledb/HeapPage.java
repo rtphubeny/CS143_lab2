@@ -249,7 +249,7 @@ public class HeapPage implements Page {
         // some code goes here
         int pos = t.getRecordId().tupleno();
 
-        if (t.getRecordId() != pid)
+        if (t.getRecordId().getPageId() != pid)
             throw new DbException("tuple not on page");
 
         if (!isSlotUsed(pos))
