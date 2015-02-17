@@ -14,7 +14,7 @@ public class IntegerAggregator implements Aggregator {
     private Op m_op;
 
     private HashMap<Field, Integer> m_group;
-    private HashMap<Field Integer> m_count;
+    private HashMap<Field, Integer> m_count;
     private String m_fieldName = "";
     private String m_groupFieldName = "";
 
