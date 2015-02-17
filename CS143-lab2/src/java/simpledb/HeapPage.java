@@ -247,16 +247,16 @@ public class HeapPage implements Page {
      */
     public void deleteTuple(Tuple t) throws DbException {
         // some code goes here
-        RecordId rId = t.getRecordId();
+        int pos = t.getRecordId().tupleno();
 
-        if (rId.getPageId() != pid) {
+        if (t.getRecordId() != pid)
             throw new DbException("tuple not on page");
-        }
-        if (!isSlotUsed(rId.tupleno())){
+
+        if (!isSlotUsed(pos))
             throw new DbException("slot is empty already");
-        }
-        tuples[rId.tupleno()] = null;
-        markSlotUsed(rId.tupleno(), false);
+    
+        tuples[pos] = null;     //null the spot where we are deleting the tuple
+        markSlotUsed(pos, false);   //mark it as not used
         // not necessary for lab1
     }
 
