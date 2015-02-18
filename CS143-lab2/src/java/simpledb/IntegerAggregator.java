@@ -64,7 +64,7 @@ public class IntegerAggregator implements Aggregator {
 	m_fieldName = tup.getTupleDesc().getFieldName(m_aField);
 	
 	if (m_gbField == Aggregator.NO_GROUPING)
-		key = Aggregator.DEFAULT_GROUP;
+		key = new IntField(Aggregator.NO_GROUPING);
 	else {
 		key = tup.getField(m_gbField);
 		m_groupFieldName = tup.getTupleDesc().getFieldName(m_gbField);
@@ -72,37 +72,54 @@ public class IntegerAggregator implements Aggregator {
 	val = ((IntField)tup.getField(m_aField)).getValue();
 
 
-	if (!m_group.containsKey(key))
-	{	//m_group does NOT yet contain key
-		if (m_op == Op.COUNT || m_op == Op.SUM || m_op == Op.AVG)
-			m_group.put(key, 0);
-		else if (m_op == Op.MAX)
-			m_group.put(key, -99999);
-		else if (m_op == Op.MIN)
-			m_group.put(key, 99999);
-
-		m_count.put(key, 0);
-	}
+	
 	curAVal = m_group.get(key);
 	curCount = m_count.get(key);
 
 
-	if ((m_op == Op.MAX && val > curAVal) || (m_op == Op.MIN && val < curAVal))
+	if (!m_group.containsKey(key))
+	{	//m_group does NOT yet contain key
+		if (m_op == Op.COUNT) {
+			m_group.put(key, 1);
+		}
+		else if (m_op == Op.SUM) {
+			m_group.put(key, val);
+		}
+		else if (m_op == Op.AVG) {
+			m_group.put(key, val);
+			m_count.put(key, 1);
+		}
+		else if (m_op == Op.MAX) {
+			m_group.put(key, Math.min(Integer.MIN_VALUE, val));
+		}
+		else if (m_op == Op.MIN) { 
+			m_group.put(key, Math.max(Integer.MAX_VALUE, val));
+		}
+	}
+
+	else if ((m_op == Op.MAX && val > curAVal) || (m_op == Op.MIN && val < curAVal)) {
 		curAVal = val;
+		m_group.put(key, curAVal);
+	}
 
-	if (m_op == Op.COUNT)
+	else if (m_op == Op.COUNT) {
 		curAVal++;
+		m_group.put(key, curAVal);
+	}
 
-	if (m_op == Op.SUM)
+	else if (m_op == Op.SUM) {
 		curAVal += val;
+		m_group.put(key, curAVal);
+	}
 
-	if (m_op == Op.AVG) {
+	else if (m_op == Op.AVG) {
 		curCount++;
 		m_count.put(key, curCount);
 		curAVal += val;
+		m_group.put(key, curAVal);
 	}
 
-	m_group.put(key, curAVal);
+	//m_group.put(key, curAVal);
 
 	// some code goes here
     }
