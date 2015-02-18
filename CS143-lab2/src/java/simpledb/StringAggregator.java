@@ -61,8 +61,6 @@ public class StringAggregator implements Aggregator {
             m_group.put(key, 1);
         else
             m_group.put(key, 1+curAVal);
-
-        
         
         // some code goes here
     }

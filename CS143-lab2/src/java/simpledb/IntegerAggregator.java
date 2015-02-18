@@ -65,8 +65,8 @@ public class IntegerAggregator implements Aggregator {
 		key = tup.getField(m_gbField);
 		m_groupFieldName = tup.getTupleDesc().getFieldName(m_gbField);
 	}
+	
 	val = ((IntField)tup.getField(m_aField)).getValue();
-
 
 	if (!m_group.containsKey(key))
 	{	//m_group does NOT yet contain key
