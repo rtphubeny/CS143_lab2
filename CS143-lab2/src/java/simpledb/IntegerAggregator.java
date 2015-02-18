@@ -53,13 +53,18 @@ public class IntegerAggregator implements Aggregator {
      */
     public void mergeTupleIntoGroup(Tuple tup) {
 	Field key;
+	/*if (m_gbField != Aggregator.NO_GROUPING)
+		key = tup.getField(m_gbField);
+	else
+		key = Aggregator.DEFAULT_GROUP;*/
+
 	int val;
 	int curAVal; //current aggregate value
 	int curCount; //current count value
 	m_fieldName = tup.getTupleDesc().getFieldName(m_aField);
 	
 	if (m_gbField == Aggregator.NO_GROUPING)
-		key = new IntField(Aggregator.NO_GROUPING);
+		key = Aggregator.DEFAULT_GROUP;
 	else {
 		key = tup.getField(m_gbField);
 		m_groupFieldName = tup.getTupleDesc().getFieldName(m_gbField);
