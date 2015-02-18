@@ -77,7 +77,74 @@ public class StringAggregator implements Aggregator {
      */
     //nearly the same as integer aggregator
     public DbIterator iterator() {
-        ArrayList<Tuple> tupleList = new ArrayList<Tuple>(); //list of tuples
+        return new DbIterator() {
+
+            TupleDesc resultTd;
+            Iterator<Map.Entry<Field, Integer>> it;
+            boolean isOpen;
+
+            @Override
+            public void open() throws DbException, TransactionAbortedException {
+                resultTd = isGroupAggregator() ?
+                        new TupleDesc(new Type[] { m_gbFieldType, Type.INT_TYPE }) :
+                        new TupleDesc(new Type[] { Type.INT_TYPE });
+
+                it = m_groupResult.entrySet().iterator();
+                isOpen = true;
+            }
+
+            @Override
+            public boolean hasNext() throws DbException, TransactionAbortedException {
+                if (!isOpen)
+                    return false;
+                return it.hasNext();
+            }
+
+            @Override
+            public Tuple next() throws DbException, TransactionAbortedException, NoSuchElementException {
+                if (!hasNext())
+                    throw new NoSuchElementException("no more tuples");
+
+                Map.Entry<Field, Integer> entry = it.next();
+                if (m_gbField != Aggregator.NO_GROUPING)
+                    return makeResultTuple(entry.getKey(), entry.getValue());
+                else
+                    return makeResultTuple(entry.getValue());
+            }
+
+            @Override
+            public void rewind() throws DbException, TransactionAbortedException {
+                close();
+                open();
+            }
+
+            @Override
+            public TupleDesc getTupleDesc() {
+                return resultTd;
+            }
+
+            @Override
+            public void close() {
+                isOpen = false;
+            }
+
+            // make result tuple for grouping aggregator
+            private Tuple makeResultTuple(Field groupField, int aggValue) {
+                Tuple result = new Tuple(resultTd);
+                result.setField(0, groupField);
+                result.setField(1, new IntField(aggValue));
+                return result;
+            }
+
+            // make result tuple for no grouping aggregator
+            private Tuple makeResultTuple(int aggValue) {
+                Tuple result = new Tuple(resultTd);
+                result.setField(0, new IntField(aggValue));
+                return result;
+            }
+        };
+
+        /*ArrayList<Tuple> tupleList = new ArrayList<Tuple>(); //list of tuples
         TupleDesc descriptor = this.getTupleDesc();
 
         if (m_gbField == Aggregator.NO_GROUPING) {
@@ -100,7 +167,7 @@ public class StringAggregator implements Aggregator {
             }
         }
         
-        return new TupleIterator(descriptor, tupleList);
+        return new TupleIterator(descriptor, tupleList);*/
         // some code goes here
         //throw new UnsupportedOperationException("please implement me for lab2");
     }
