@@ -49,7 +49,7 @@ public class StringAggregator implements Aggregator {
         
         //determining key
         if (m_gbField == Aggregator.NO_GROUPING) {
-            key = new IntField(Aggregator.NO_GROUPING);
+            key = new IntField(0);
         } else {
             key = tup.getField(m_gbField);
             m_groupFieldName = tup.getTupleDesc().getFieldName(m_gbField);
