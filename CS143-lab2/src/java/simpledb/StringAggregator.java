@@ -85,7 +85,7 @@ public class StringAggregator implements Aggregator {
 
             @Override
             public void open() throws DbException, TransactionAbortedException {
-                resultTd = isGroupAggregator() ?
+                resultTd = m_gbField != Aggregator.NO_GROUPING ?
                         new TupleDesc(new Type[] { m_gbFieldType, Type.INT_TYPE }) :
                         new TupleDesc(new Type[] { Type.INT_TYPE });
 
