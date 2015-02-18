@@ -73,9 +73,9 @@ public class IntegerAggregator implements Aggregator {
 		if (m_op == Op.COUNT || m_op == Op.SUM || m_op == Op.AVG)
 			m_group.put(key, 0);
 		else if (m_op == Op.MAX)
-			m_group.put(key, -99999);
+			m_group.put(key, Integer.MIN_VALUE);
 		else if (m_op == Op.MIN)
-			m_group.put(key, 99999);
+			m_group.put(key, Integer.MAX_VALUE);
 
 		m_count.put(key, 0);
 	}
