@@ -86,3 +86,9 @@ the concurrent hash map at a time.
 Overall the lab took us again about a week, but this time a lot more time
 dedicated in the end to fine-tune our functions to get all tests to work,
 hence taking an extra day.
+
+However, even though the given tests work, we were unable to solve some
+other problems. For example, aggregates do not function correctly unless
+GROUP BY is specified, so statements such as
+	SELECT COUNT(*) from Data d;
+do not work correctly.
