@@ -53,15 +53,17 @@ public class StringAggregator implements Aggregator {
         } else {
             key = tup.getField(m_gbField);
             m_groupFieldName = tup.getTupleDesc().getFieldName(m_gbField);
+
         }   
     
-        curAVal = m_group.get(key);
         //does not contain key yet
-        if (curAVal == null)
-            m_group.put(key, 1);
-        else
-            m_group.put(key, 1+curAVal);
-        
+        if (!m_group.containsKey(key))
+            m_group.put(key, 0);
+
+        curAVal = m_group.get(key);
+
+        curAVal++;
+        m_group.put(key, curAVal);
         // some code goes here
     }
 
