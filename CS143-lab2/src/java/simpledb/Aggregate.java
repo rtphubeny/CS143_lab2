@@ -13,10 +13,10 @@ public class Aggregate extends Operator {
 
 	private DbIterator m_child;
 	private DbIterator m_aChild;	//aggregated child
-	int m_aField;
-	int m_gField;
+	private int m_aField;
+	private int m_gField;
 
-	Aggregator.Op m_op;
+	private Aggregator.Op m_op;
 	private Aggregator m_agg;
 	private Iterator<Tuple> m_it;
 
