@@ -45,10 +45,8 @@ public class Insert extends Operator {
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
-	try{
 	this._child.open();
 	super.open();
-	} catch (DbException e){} catch (TransactionAbortedException e){}
     }
 
     public void close() {
@@ -79,24 +77,22 @@ public class Insert extends Operator {
         // some code goes here
 	if (this._fetchNextCalled)
 		return null;
-	try{
-		int nInserted = 0;
-		// insert tuple
-		while (this._child.hasNext()){
-			nInserted ++;
-			Tuple t = this._child.next();
-			try{
-				Database.getBufferPool().insertTuple(this._tid, this._tableid, t);
-			} catch(IOException e){}
-		}
-    		this._fetchNextCalled = true;
+	int nInserted = 0;
+	// insert tuple
+	while (this._child.hasNext()){
+		nInserted ++;
+		Tuple t = this._child.next();
+		try{
+			Database.getBufferPool().insertTuple(this._tid, this._tableid, t);
+		} catch(IOException e){}
+	}
+    	this._fetchNextCalled = true;
 
-		// create tuple for return
-		Tuple return_t = new Tuple(this.getTupleDesc());
-		IntField f = new IntField(nInserted);
-		return_t.setField(0, f);
-		return return_t;
-	} catch(TransactionAbortedException e){return null;}catch(DbException e){return null;}
+	// create tuple for return
+	Tuple return_t = new Tuple(this.getTupleDesc());
+	IntField f = new IntField(nInserted);
+	return_t.setField(0, f);
+	return return_t;
     }
 
     @Override

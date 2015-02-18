@@ -47,8 +47,13 @@ public class JoinPredicate implements Serializable {
 		return false;
 	Field f1 = t1.getField(this._field1);
 	Field f2 = t2.getField(this._field2);
-	
-        return f1.compare(this._op, f2);
+	if (f1 == null && f2 == null)
+		return true;
+	if (f1 != null)
+        	return f1.compare(this._op, f2);
+	if (f2 != null)
+        	return f2.compare(this._op, f1);
+	return false;
     }
     
     public int getField1()

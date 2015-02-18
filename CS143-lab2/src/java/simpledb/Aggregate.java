@@ -51,9 +51,9 @@ public class Aggregate extends Operator {
 		gbType = m_child.getTupleDesc().getFieldType(m_gField);
 
 
-	if (aType == Type.INT_TYPE)
+	if (aType.equals(Type.INT_TYPE))
 		m_agg = new IntegerAggregator(m_gField, gbType, m_aField, m_op);
-	else
+	else if (aType.equals(Type.STRING_TYPE))
 		m_agg = new StringAggregator(m_gField, gbType, m_aField, m_op);
 	// some code goes here
     }
@@ -131,6 +131,8 @@ public class Aggregate extends Operator {
      * aggregate. Should return null if there are no more tuples.
      */
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
+	if (m_aChild == null)
+		return null;
 	if (m_aChild.hasNext())
 		return m_aChild.next();
 	// some code goes here

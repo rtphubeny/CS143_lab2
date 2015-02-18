@@ -67,6 +67,8 @@ public class Filter extends Operator {
     protected Tuple fetchNext() throws NoSuchElementException,
             TransactionAbortedException, DbException {
         // some code goes here
+	if (this._child == null)
+		return null;
 	while (this._child.hasNext()){
 		Tuple t = this._child.next();
 		if (this._p.filter(t))

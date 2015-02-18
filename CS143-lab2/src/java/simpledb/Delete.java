@@ -68,22 +68,20 @@ public class Delete extends Operator {
 	if (this._fetchNextCalled)
 		return null;
 	int nDeleted = 0;
-	try{
-		while (this._child.hasNext()){
-			Tuple t = this._child.next();
-			nDeleted++;
-			try{
-				Database.getBufferPool().deleteTuple(this._tid, t);
-			}catch(IOException e){return null;}
-		}
-		this._fetchNextCalled = true;
+	while (this._child.hasNext()){
+		Tuple t = this._child.next();
+		nDeleted++;
+		try{
+			Database.getBufferPool().deleteTuple(this._tid, t);
+		}catch(IOException e){return null;}
+	}
+	this._fetchNextCalled = true;
 
-		// create tuple for return
-                Tuple return_t = new Tuple(this.getTupleDesc());
-                IntField f = new IntField(nDeleted);
-                return_t.setField(0, f);
-                return return_t;
-	}catch(TransactionAbortedException e){return null;}catch(DbException e){return null;}
+	// create tuple for return
+        Tuple return_t = new Tuple(this.getTupleDesc());
+        IntField f = new IntField(nDeleted);
+        return_t.setField(0, f);
+        return return_t;
     }
 
     @Override
