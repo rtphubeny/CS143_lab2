@@ -4,6 +4,12 @@ package simpledb;
  */
 public class IntHistogram {
 
+        private int m_min;
+        private int m_max;
+        private int m_numBuckets;
+        private int[] m_histogram;
+        private int m_bucketSize;
+        private int m_numTuples;
     /**
      * Create a new IntHistogram.
      * 
@@ -21,7 +27,28 @@ public class IntHistogram {
      * @param max The maximum integer value that will ever be passed to this class for histogramming
      */
     public IntHistogram(int buckets, int min, int max) {
-    	// some code goes here
+        this.m_min = min;
+        this.m_max = max;
+        this.m_numBuckets = buckets;
+        m_histogram = new int[buckets];
+        m_bucketSize = (int) Math.ceil((double)((max - min +1)/buckets));
+        m_numTuples = 0;
+        // some code goes here
+    }
+
+    private int bucketIndex(int v)
+    {
+        return ((v - m_min)/m_bucketSize);
+    }
+
+    private int bucketMax(int bucketIndex) 
+    {
+        return (m_min + (bucketIndex + 1) * _bucketSize - 1);
+    }
+
+    private int bucketMin(int bucketIndex)
+    {
+        return (m_min + bucketIndex * _bucketSize);
     }
 
     /**
@@ -29,7 +56,15 @@ public class IntHistogram {
      * @param v Value to add to the histogram
      */
     public void addValue(int v) {
-    	// some code goes here
+    	if (v == m_min)
+            m_histogram[0]++;
+        else if (v == m_max)
+            m_histogram[m_numBuckets-1]++;
+        else
+            m_histogram[bucketIndex(v)]++;
+        
+        m_numTuples++;
+        // some code goes here
     }
 
     /**
@@ -43,9 +78,67 @@ public class IntHistogram {
      * @return Predicted selectivity of this particular operator and value
      */
     public double estimateSelectivity(Predicate.Op op, int v) {
+        int index = bucketIndex(v);
+        double estTuples = 0.0;
+
+        if (op == Op.EQUALS)
+        {
+            if (v < m_min || v > m_max) 
+                estTuples = 0.0;
+            else 
+                estTuples = m_histogram[index] / m_bucketSize;
+        }
+
+        if (op == Op.NOT_EQUALS)
+        {
+            if (v < m_min || v > m_max) 
+                estTuples = m_numTuples;
+            else 
+                estTuples = m_numTuples - (m_histogram[index] / m_bucketSize);
+        }
+
+        if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
+        {
+            if (v < m_min)
+                estTuples = m_numTuples;
+            else if (v > m_max)
+                estTuples = 0.0;
+            else {
+                double fract;
+                if (op == Op.GREATER_THAN)
+                    fract = (bucketMax(index) - v) / (double) m_bucketSize;
+                else
+                    fract = (bucketMax(index) - v + 1) / (double) m_bucketSize;
+                
+                estTuples = m_histogram[index] * fract;
+                
+                for (int i = index + 1; i < m_histogram.length; i++)
+                    estTuples += m_histogram[i];
+            }
+        }
+
+        if (op == Op.LESS_THAN || op == Op.LESS_THAN_OR_EQ)
+        {
+            if (v < m_min)
+                estTuples = 0.0;
+            else if (v > m_max)
+                estTuples = m_numTuples;
+            else {
+                double fract;
+                if (op == Op.LESS_THAN)
+                    fract = (v - bucketMin(index)) / (double) m_bucketSize;
+                else
+                    fract = (v - bucketMin(index) + 1) / (double) m_bucketSize;
+
+                estTuples = m_histogram[index] * fract;
+                
+                for (int i = 0; i < index; i++)
+                    estTuples += m_histogram[i];
+            }
+        }
 
     	// some code goes here
-        return -1.0;
+        return estTuples / m_numTuples;
     }
     
     /**
@@ -67,6 +160,7 @@ public class IntHistogram {
      */
     public String toString() {
         // some code goes here
-        return null;
+        return String.format("min=%d, max=%d, bucketSize=%d, bucketNum=%d, numberOfTuples=%d\n",
+                             m_min, m_max, m_bucketSize, m_histogram.length, m _numTuples);
     }
 }
