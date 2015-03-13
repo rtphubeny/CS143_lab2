@@ -87,7 +87,7 @@ public class IntHistogram {
         {
             for(int i = 0; i < this.m_numBuckets; i++) {
                 if((v < (m_min + (i+1)*this.m_bucketSize)) && (v >= (m_min + i * this.m_bucketSize))) {
-                    estTuples = (double)(m_histograms[i]/m_bucketSize)/m_numTuples;
+                    estTuples = (double)(m_histogram[i]/m_bucketSize)/m_numTuples;
                     return estTuples;
                 }
             }
