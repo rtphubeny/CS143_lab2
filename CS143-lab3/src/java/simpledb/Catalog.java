@@ -74,7 +74,6 @@ public class Catalog {
 	// some code goes here
 	for (Table i : CatMap.values()){
 		if ((i.getName()).equals(name)){
-			if (i.getFile() != null)
 				return i.getFile().getId();
 		}
 	}

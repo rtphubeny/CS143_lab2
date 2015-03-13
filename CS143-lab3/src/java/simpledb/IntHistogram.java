@@ -90,14 +90,12 @@ public class IntHistogram {
                 if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
                 {
                     if (op == Op.EQUALS)
-                        estTuples = (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
+                        estTuples = (double) (m_histogram[i]/m_bucketSize);
                     else
-                        estTuples = 1 - (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
+                        estTuples = 1 - (double) (m_histogram[i]/m_bucketSize);
                     break;
                 }
             }
-
-            return estTuples;
         }
 
         if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
