@@ -4,7 +4,50 @@ Rebecca Hubeny	104133091
 
 Slip Time:
 (i) This project is late by 1 day.
-(ii) Both partners now have 3 remaining slip days.
+(ii) Both partners now have 2 remaining slip days.
+
+LAB 3 REPORT
+
+Parser.java
+
+The implementation of IntHistogram.java was not overwhelmingly difficult, 
+but it did cause a few headaches with how specific it was. The size of a 
+bucket was needed, so we had a member variable m_bucketSize fort this, 
+although it was giving us issues with dividing by 0. We resolved this by
+realizing we need to cast both the denominator and numerator before 
+dividing so we get an actual fraction, not a rounded off integer. We 
+implemented a few helper functions to assist in adding a value to the 
+histogram, which is simply an array of ints. The helpers were used more in
+estimateSelectivity, which the majority of the work and even some problems 
+with TableStats.java occurred.
+
+estimateSelectivity is broken down into each possible operation, and then 
+handled accordingly. Each involved some trial and error, but NOT_EQUALS 
+gave us a lot of trouble in terms of TableStats.java; all of the tests in 
+TableStats.java worked, except for estimateSelectivity. After narrowing 
+down which specifc assert cases, we found that it was the NOT_EQUALS cases
+that were not being executed as they should have. To fix this, NOT_EQUALS
+was implemented in its own if statement, and its results were returned 
+immediately to avoid any miscalculations.
+
+The constructor of TableStats was also a point of hardship. We ended up 
+deciding that HashMaps were the best way to design this class, since we 
+have used them before in SimpleDB and also they were used in this specific
+class prior to us filling our portion of the code. In essence, we found the
+transaction ID to get an iterator to help catch exceptions and also to get
+values we needed. We start by getting the max and min values in separate 
+HashMaps, and then proceed on to the histograms, adding values according to 
+if they are INT_TYPE or STRING_TYPE. The histogram is then added to our 
+HashMap, and we are able to use the HashMap to find different stats, such 
+as selectivity.
+
+This lab took us a bit longer than the other two labs, as the concepts in 
+this lab are much more advanced. The detailed nature of this lab, such as 
+calculating table statistics, took a lot longer than we expected, hence our
+project being late. Overall, the lab took us about a week and a half, almost
+2 weeks.
+
+__________________________________________________________________________
 
 LAB 2 REPORT
 
