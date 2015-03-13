@@ -32,13 +32,14 @@ public class IntHistogram {
         this.m_max = max;
         this.m_numBuckets = buckets;
         m_histogram = new int[buckets];
-        m_bucketSize = (int) Math.ceil( (double)( (max - min +1)/buckets) );
+        m_bucketSize = (int) Math.ceil( (double)( (max - min + 1)/buckets) );
         m_numTuples = 0;
         // some code goes here
     }
 
     private int bucketIndex(int v)
     {
+        //WHAT IF BUCKET SIZE = 0?
         return ((v - m_min)/m_bucketSize);
     }
 
@@ -84,10 +85,17 @@ public class IntHistogram {
 
         if (op == Op.EQUALS)
         {
-            if (v < m_min || v > m_max) 
+            for(int i = 0; i < this.m_numBuckets; i++) {
+                if((v < (m_min + (i+1)*this.m_bucketSize)) && (v >= (m_min + i * this.m_bucketSize))) {
+                    estTuples = (double)(m_histograms[i]/m_bucketSize)/m_numTuples;
+                    return estTuples;
+                }
+            }
+            return estTuples;
+            /*if (v < m_min || v > m_max) 
                 estTuples = 0.0;
-            else 
-                estTuples = m_histogram[index] / m_bucketSize;
+            else //WHAT IF BUCKET SIZE = 0?
+                estTuples = m_histogram[index] / m_bucketSize;*/
         }
 
         if (op == Op.NOT_EQUALS)
