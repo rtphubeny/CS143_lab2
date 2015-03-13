@@ -83,21 +83,29 @@ public class IntHistogram {
         int index = bucketIndex(v);
         double estTuples = 0.0;
 
-        if (op == Op.EQUALS || op == Op.NOT_EQUALS)
+        if (op == Op.EQUALS)
         {
-            if (op == Op.NOT_EQUALS)
-                estTuples = 1.0;
             for(int i = 0; i < m_numBuckets; i++) 
             {
                 if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
                 {
-                    if (op == Op.EQUALS)
-                        estTuples = (double) (m_histogram[i]/m_bucketSize);
-                    else
-                        estTuples = 1 - (double) (m_histogram[i]/m_bucketSize);
+                    estTuples = (double) (m_histogram[i]/m_bucketSize);
                     break;
                 }
             }
+        }
+
+        if (op == Op.NOT_EQUALS)
+        {
+            for(int i = 0; i < m_numBuckets; i++) 
+            {
+                if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
+                {
+                    estTuples = 1 - (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
+                    return estTuples;
+                }
+            }
+            return 1 - estTuples;
         }
 
         if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
