@@ -64,7 +64,7 @@ public class IntHistogram {
             m_histogram[0]++;
         else if (v == m_max)
             m_histogram[m_numBuckets-1]++;
-        else {
+        else
             m_histogram[bucketIndex(v)]++;
         
         m_numTuples++;
