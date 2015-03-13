@@ -63,7 +63,7 @@ public class IntHistogram {
             m_histogram[m_numBuckets-1]++;
         else
             m_histogram[bucketIndex(v)]++;
-        
+        e
         m_numTuples++;
         // some code goes here
     }
