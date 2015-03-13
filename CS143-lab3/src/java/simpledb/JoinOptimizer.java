@@ -111,7 +111,7 @@ public class JoinOptimizer {
             // HINT: You may need to use the variable "j" if you implemented
             // a join algorithm that's more complicated than a basic
             // nested-loops join.
-            return -1.0;
+            return cost1 + card1 * cost2 + card1 * card2;
         }
     }
 
@@ -157,6 +157,24 @@ public class JoinOptimizer {
             Map<String, Integer> tableAliasToId) {
         int card = 1;
         // some code goes here
+	if (joinOp == Predicate.Op.EQUALS){
+		if (t1pkey){
+			card = card2;
+		}
+		else if (t2pkey){
+			card = card1;
+		}
+		else{
+			if (card1 > card2)
+				card = card1;
+			else
+				card = card2;
+		}
+	}
+	else{
+		card = card1 * card2 * 30 / 100;
+	}
+
         return card <= 0 ? 1 : card;
     }
 
@@ -220,8 +238,45 @@ public class JoinOptimizer {
         //Not necessary for labs 1--3
 
         // some code goes here
-        //Replace the following
-        return joins;
+	PlanCache optjoin = new PlanCache();
+
+	for (int i = 1; i <= this.joins.size(); i++){
+		Set<Set<LogicalJoinNode>> subsets = enumerateSubsets(this.joins, i);
+		for (Set<LogicalJoinNode> s : subsets){
+			//initialize best plan costcard for s
+			CostCard bestplan = new CostCard();
+			bestplan.cost = Double.MAX_VALUE;
+			bestplan.card = Integer.MAX_VALUE;
+			bestplan.plan = null;
+
+			for (LogicalJoinNode j : s){
+				CostCard plan = computeCostAndCardOfSubplan(stats, filterSelectivities, j, s, bestplan.cost, optjoin);
+				if (plan != null){
+					if (plan.cost < bestplan.cost || bestplan.plan == null){
+						bestplan = plan;
+					}
+				}
+			}
+
+			if (bestplan.plan != null){
+				optjoin.addPlan(s, bestplan.cost, bestplan.card, bestplan.plan);
+			}
+
+		}
+	}
+
+	Set<LogicalJoinNode> r_s = new HashSet<LogicalJoinNode>();
+	r_s.addAll(this.joins);
+	Vector<LogicalJoinNode> r_v = optjoin.getOrder(r_s);
+
+	if (r_v == null)
+		r_v = new Vector<LogicalJoinNode>();
+
+	if (explain){
+		printJoins(r_v, optjoin, stats, filterSelectivities);
+	}
+
+	return r_v;
     }
 
     // ===================== Private Methods =================================
