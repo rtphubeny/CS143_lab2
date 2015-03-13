@@ -87,23 +87,26 @@ public class IntHistogram {
         {
             for(int i = 0; i < this.m_numBuckets; i++) {
                 if((v < (m_min + (i+1)*this.m_bucketSize)) && (v >= (m_min + i * this.m_bucketSize))) {
-                    estTuples = (double)(m_histogram[i]/m_bucketSize)/m_numTuples;
+                    estTuples = (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
+                    return estTuples;
+                }
+            }
+            return estTuples;
+        }
+
+        if (op == Op.NOT_EQUALS)
+        {
+            for(int i = 0; i < this.m_numBuckets; i++) {
+                if((v < (m_min + (i+1)*this.m_bucketSize)) && (v >= (m_min + i * this.m_bucketSize))) {
+                    estTuples = 1 - (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
                     return estTuples;
                 }
             }
             return estTuples;
             /*if (v < m_min || v > m_max) 
-                estTuples = 0.0;
-            else //WHAT IF BUCKET SIZE = 0?
-                estTuples = m_histogram[index] / m_bucketSize;*/
-        }
-
-        if (op == Op.NOT_EQUALS)
-        {
-            if (v < m_min || v > m_max) 
                 estTuples = m_numTuples;
             else 
-                estTuples = m_numTuples - (m_histogram[index] / m_bucketSize);
+                estTuples = m_numTuples - (m_histogram[index] / m_bucketSize);*/
         }
 
         if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
