@@ -72,9 +72,9 @@ public class TableStats {
     private TupleDesc m_td; //tuple descriptor
     private HeapFile m_file;
     
-    private HashMap<String, Object> m_histograms;
-    private HashMap<String, Integer> m_mins;
-    private HashMap<String, Integer> m_maxs;
+    private HashMap<String, Object> m_histograms; //contains all histograms
+    private HashMap<String, Integer> m_mins;    //keeping track of min values
+    private HashMap<String, Integer> m_maxs;    //keeping track of max values
 
     /**
      * Create a new TableStats object, that keeps track of statistics on each
@@ -111,7 +111,7 @@ public class TableStats {
         DbFileIterator it = m_file.iterator(transId);
 
         try {
-            it.open();
+            it.open(); //to catch exceptions
             while (it.hasNext())
             {
                 Tuple tup = it.next();
@@ -123,6 +123,7 @@ public class TableStats {
                     if (ftype.equals(Type.INT_TYPE))
                     {
                         int val = ((IntField) tup.getField(i)).getValue();
+
                         if (!m_mins.containsKey(fname) || val < m_mins.get(fname))
                             m_mins.put(fname, val);
 
@@ -132,10 +133,10 @@ public class TableStats {
                 }
             }
 
-            it.rewind();
+            it.rewind(); //to catch exceptions
 
             for (String key : m_mins.keySet()) {
-                int val = m_mins.get(key);
+
                 IntHistogram hist = new IntHistogram(NUM_HIST_BINS, m_mins.get(key), m_maxs.get(key));
                 m_histograms.put(key, hist);
             }
@@ -154,6 +155,7 @@ public class TableStats {
                     { //INT_TYPE
                         int val = ((IntField) tup.getField(i)).getValue();
                         IntHistogram hist = (IntHistogram) m_histograms.get(fname);
+                        
                         hist.addValue(val);
                         m_histograms.put(fname, hist);
                     } 
@@ -161,8 +163,9 @@ public class TableStats {
                     { //STRING_TYPE
                         String val = ((StringField) tup.getField(i)).getValue();
                         StringHistogram hist;
+
                         if (m_histograms.containsKey(fname)) 
-                        {//histograms contains StringHistogram
+                        {//histograms contains hist
                             hist = (StringHistogram) m_histograms.get(fname);
                             hist.addValue(val);
                         } 
@@ -250,14 +253,14 @@ public class TableStats {
         {
             int val = ((IntField) constant).getValue();
             IntHistogram hist = (IntHistogram) m_histograms.get(m_td.getFieldName(field));
-
+            //use histogram selectivity to find
             return hist.estimateSelectivity(op, val);
         } 
         else 
         {
             String val = ((StringField) constant).getValue();
             StringHistogram hist = (StringHistogram) m_histograms.get(m_td.getFieldName(field));
-
+            //use histogram selectivity to find
             return hist.estimateSelectivity(op, val);
         }
 

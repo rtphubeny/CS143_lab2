@@ -33,13 +33,14 @@ public class IntHistogram {
         this.m_numBuckets = buckets;
         m_histogram = new int[buckets];
         m_bucketSize = (int) Math.ceil( ( (double)(max - min + 1)/(double)buckets) );
+        //casting is needed in very specific places to avoid dividing by zero
         m_numTuples = 0;
         // some code goes here
     }
 
+    //helper functions
     private int bucketIndex(int v)
     {
-        //WHAT IF BUCKET SIZE = 0?
         return ((v - m_min)/m_bucketSize);
     }
 
@@ -102,9 +103,10 @@ public class IntHistogram {
                 if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
                 {
                     estTuples = 1 - (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
-                    return estTuples;
+                    return estTuples; //needed so that returns with correct value instead of 1 - estTuples
                 }
             }
+            //needed so that it does not divide by number of tuples at bottom
             return 1 - estTuples;
         }
 
@@ -150,6 +152,7 @@ public class IntHistogram {
 
     	// some code goes here
         return estTuples / m_numTuples;
+        //return the estimated tuples divided by the number of tuples
     }
     
     /**
