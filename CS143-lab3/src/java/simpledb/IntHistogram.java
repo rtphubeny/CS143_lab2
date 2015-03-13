@@ -85,7 +85,7 @@ public class IntHistogram {
 
         if (op == Op.EQUALS || op == Op.NOT_EQUALS)
         {
-            if (Op.NOT_EQUALS)
+            if (op == Op.NOT_EQUALS)
                 estTuples = 1.0;
             for(int i = 0; i < m_numBuckets; i++) 
             {
