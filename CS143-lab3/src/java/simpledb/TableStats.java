@@ -177,10 +177,12 @@ public class TableStats {
                 }
             }
         }
-        catch (DbException e) 
+        catch (DbException e) {
             e.printStackTrace();
-        catch (TransactionAbortedException e)
+        }
+        catch (TransactionAbortedException e) {
             e.printStackTrace();
+        }
 
     }
     /**
