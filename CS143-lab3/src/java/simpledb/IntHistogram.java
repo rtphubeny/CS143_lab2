@@ -83,7 +83,7 @@ public class IntHistogram {
         int index = bucketIndex(v);
         double estTuples = 0.0;
 
-        if (op == Op.EQUALS || Op.NOT_EQUALS)
+        if (op == Op.EQUALS || op == Op.NOT_EQUALS)
         {
             for(int i = 0; i < m_numBuckets; i++) 
             {
