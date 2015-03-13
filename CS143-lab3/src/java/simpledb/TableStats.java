@@ -118,7 +118,7 @@ public class TableStats {
 
         try {
             // need a SeqScan to collect min & max of int field
-            if (hasIntField) {
+            if (hasInt) {
                 int[] mins = new int[m_td.numFields()];
                 int[] maxs = new int[m_td.numFields()];
                 for (int i = 0; i < m_td.numFields(); i++) {
