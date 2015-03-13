@@ -43,8 +43,8 @@ public class Catalog {
 		throw new IllegalArgumentException("Name is null");
 	else
 	{
-		if (CatMap.containsKey(tabId))
-			return;
+		/*if (CatMap.containsKey(tabId))
+			return;*/
 		Table new_table = new Table(file, name, pkeyField);
 		CatMap.put(tabId, new_table);
 	}
