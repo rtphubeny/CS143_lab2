@@ -58,14 +58,15 @@ public class IntHistogram {
      * @param v Value to add to the histogram
      */
     public void addValue(int v) {
-    	if (v == m_min)
-            m_histogram[0]++;
-        else if (v == m_max)
-            m_histogram[m_numBuckets-1]++;
-        else
-            m_histogram[bucketIndex(v)]++;
-        
-        m_numTuples++;
+    	for(int i = 0; i < m_numBuckets; i++) 
+        {
+            if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
+            {
+                m_histogram[i]++;
+                m_numTuples++;
+                return;
+            }
+        }
         // some code goes here
     }
 
