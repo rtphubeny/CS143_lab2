@@ -97,7 +97,7 @@ public class IntHistogram {
                 }
             }
 
-            //return estTuples;
+            return estTuples;
         }
 
         if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
