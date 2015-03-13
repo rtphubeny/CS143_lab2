@@ -83,30 +83,21 @@ public class IntHistogram {
         int index = bucketIndex(v);
         double estTuples = 0.0;
 
-        if (op == Op.EQUALS)
+        if (op == Op.EQUALS || op == Op.NOT_EQUALS)
         {
-            for(int i = 0; i < this.m_numBuckets; i++) {
-                if((v < (m_min + (i+1)*this.m_bucketSize)) && (v >= (m_min + i * this.m_bucketSize))) {
-                    estTuples = (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
-                    return estTuples;
+            for(int i = 0; i < m_numBuckets; i++) 
+            {
+                if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
+                {
+                    if (op == Op.EQUALS)
+                        estTuples = (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
+                    else
+                        estTuples = 1 - (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
+                    break;
                 }
             }
-            return estTuples;
-        }
 
-        if (op == Op.NOT_EQUALS)
-        {
-            for(int i = 0; i < this.m_numBuckets; i++) {
-                if((v < (m_min + (i+1)*this.m_bucketSize)) && (v >= (m_min + i * this.m_bucketSize))) {
-                    estTuples = 1 - (double) (m_histogram[i]/m_bucketSize)/m_numTuples;
-                    return estTuples;
-                }
-            }
             return estTuples;
-            /*if (v < m_min || v > m_max) 
-                estTuples = m_numTuples;
-            else 
-                estTuples = m_numTuples - (m_histogram[index] / m_bucketSize);*/
         }
 
         if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
