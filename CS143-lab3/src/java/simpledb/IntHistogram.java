@@ -1,4 +1,5 @@
 package simpledb;
+import simpledb.Predicate.Op;
 
 /** A class to represent a fixed-width histogram over a single integer-based field.
  */
@@ -43,12 +44,12 @@ public class IntHistogram {
 
     private int bucketMax(int bucketIndex) 
     {
-        return (m_min + (bucketIndex + 1) * _bucketSize - 1);
+        return (m_min + (bucketIndex + 1) * m_bucketSize - 1);
     }
 
     private int bucketMin(int bucketIndex)
     {
-        return (m_min + bucketIndex * _bucketSize);
+        return (m_min + bucketIndex * m_bucketSize);
     }
 
     /**
@@ -160,6 +161,6 @@ public class IntHistogram {
      */
     public String toString() {
         // some code goes here
-        return String.format("min=%d, max=%d, bucketSize=%d, bucketNum=%d, numberOfTuples=%d\n", m_min, m_max, m_bucketSize, m_histogram.length, m _numTuples);
+        return String.format("min=%d, max=%d, bucketSize=%d, bucketNum=%d, numberOfTuples=%d\n", m_min, m_max, m_bucketSize, m_histogram.length, m_numTuples);
     }
 }

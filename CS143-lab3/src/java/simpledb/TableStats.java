@@ -98,7 +98,7 @@ public class TableStats {
 
         m_tid = tableid;
         m_costPerPage = ioCostPerPage;
-        m_file = (HeapFile) Database.getCatalog().getDbFile(tableid);
+        m_file = (HeapFile) Database.getCatalog().getDatabaseFile(tableid);
         m_td = m_file.getTupleDesc();
         m_numTuples = 0;
 
@@ -107,12 +107,12 @@ public class TableStats {
         m_histograms = new HashMap<String, Object>();
 
         Transaction trans = new Transaction();
-        TransactiodId transId = trans.getId();
+        TransactionId transId = trans.getId();
         DbFileIterator it = m_file.iterator(transId);
 
         try {
             it.open();
-            while (it.next())
+            while (it.hasNext())
             {
                 Tuple tup = it.next();
                 for (int i = 0; i < m_td.numFields(); i++)
@@ -122,7 +122,7 @@ public class TableStats {
 
                     if (ftype.equals(Type.INT_TYPE))
                     {
-                        int val = ((IntField)tuple.getField(i)).getValue();
+                        int val = ((IntField) tup.getField(i)).getValue();
                         if (!m_mins.containsKey(fname) || val < m_mins.get(fname))
                             m_mins.put(fname, val);
 
@@ -164,12 +164,12 @@ public class TableStats {
                         if (m_histograms.containsKey(fname)) 
                         {//histograms contains StringHistogram
                             hist = (StringHistogram) m_histograms.get(fname);
-                            hist.addValue(value);
+                            hist.addValue(val);
                         } 
                         else 
                         {
                             hist = new StringHistogram(NUM_HIST_BINS);
-                            hist.addValue(value);
+                            hist.addValue(val);
                         }
 
                         m_histograms.put(fname, hist);
