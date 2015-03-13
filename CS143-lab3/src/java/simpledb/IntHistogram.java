@@ -32,9 +32,7 @@ public class IntHistogram {
         this.m_max = max;
         this.m_numBuckets = buckets;
         m_histogram = new int[buckets];
-        m_bucketSize = (int) Math.ceil( (double)( (max - min + 1)/buckets) );
-        if (m_max < m_min)
-            m_bucketSize = (int) Math.ceil( (double)( (min - max + 1)/buckets) );
+        m_bucketSize = (int) Math.ceil( ( (double)(max - min + 1)/(double)buckets) );
         m_numTuples = 0;
         // some code goes here
     }
