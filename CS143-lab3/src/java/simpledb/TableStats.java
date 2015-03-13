@@ -66,6 +66,16 @@ public class TableStats {
      */
     static final int NUM_HIST_BINS = 100;
 
+    private int m_tid; //table id
+    private int m_costPerPage;
+    private int m_numTuples;
+    private TupleDesc m_td; //tuple descriptor
+    private HeapFile m_file;
+    
+    private HashMap<String, Object> m_histograms;
+    private HashMap<String, Integer> m_mins;
+    private HashMap<String, Integer> m_maxs;
+
     /**
      * Create a new TableStats object, that keeps track of statistics on each
      * column of a table
@@ -85,8 +95,94 @@ public class TableStats {
         // necessarily have to (for example) do everything
         // in a single scan of the table.
         // some code goes here
-    }
 
+        m_tid = tableid;
+        m_costPerPage = ioCostPerPage;
+        m_file = (HeapFile) Database.getCatalog().getDbFile(tableid);
+        m_td = m_file.getTupleDesc();
+        m_numTuples = 0;
+
+        m_mins = new HashMap<String, Integer>();
+        m_maxs = new HashMap<String, Integer>();
+        m_histograms = new HashMap<String, Object>();
+
+        Transaction trans = new Transaction();
+        TransactiodId transId = trans.getId();
+        DbFileIterator it = m_file.iterator(transId);
+
+        try {
+            it.open();
+            while (it.next())
+            {
+                Tuple tup = it.next();
+                for (int i = 0; i < m_td.numFields(); i++)
+                {
+                    String fname = m_td.getFieldName(i);
+                    Type ftype = m_td.getFieldType(i);
+
+                    if (ftype.equals(Type.INT_TYPE))
+                    {
+                        int val = ((IntField)tuple.getField(i)).getValue();
+                        if (!m_mins.containsKey(fname) || val < m_mins.get(fname))
+                            m_mins.put(fname, val);
+
+                        if (!m_maxs.containsKey(fname) || val > m_maxs.get(fname))
+                            m_maxs.put(fname, val);
+                    }
+                }
+            }
+
+            it.rewind();
+
+            for (String key : m_mins.keySet()) {
+                int val = m_mins.get(key);
+                IntHistogram hist = new IntHistogram(NUM_HIST_BINS, m_mins.get(key), m_maxs.get(key));
+                m_histograms.put(key, hist);
+            }
+
+            while (it.hasNext())
+            {
+                Tuple tup = it.next();
+                m_numTuples++;
+
+                for (int i = 0; i < m_td.numFields(); i++) 
+                {
+                    String fname = m_td.getFieldName(i);
+                    Type ftype = m_td.getFieldType(i);
+
+                    if (ftype.equals(Type.INT_TYPE)) 
+                    { //INT_TYPE
+                        int val = ((IntField) tup.getField(i)).getValue();
+                        IntHistogram hist = (IntHistogram) m_histograms.get(fname);
+                        hist.addValue(val);
+                        m_histograms.put(fname, hist);
+                    } 
+                    else 
+                    { //STRING_TYPE
+                        String val = ((StringField) tup.getField(i)).getValue();
+                        StringHistogram hist;
+                        if (m_histograms.containsKey(fname)) 
+                        {//histograms contains StringHistogram
+                            hist = (StringHistogram) m_histograms.get(fname);
+                            hist.addValue(value);
+                        } 
+                        else 
+                        {
+                            hist = new StringHistogram(NUM_HIST_BINS);
+                            hist.addValue(value);
+                        }
+
+                        m_histograms.put(fname, hist);
+                    }
+                }
+            }
+        }
+        catch (DbException e) 
+            e.printStackTrace();
+        catch (TransactionAbortedException e)
+            e.printStackTrace();
+
+    }
     /**
      * Estimates the cost of sequentially scanning the file, given that the cost
      * to read a page is costPerPageIO. You can assume that there are no seeks
@@ -101,7 +197,7 @@ public class TableStats {
      */
     public double estimateScanCost() {
         // some code goes here
-        return 0;
+        return m_file.numPages()*m_costPerPage;
     }
 
     /**
@@ -115,7 +211,7 @@ public class TableStats {
      */
     public int estimateTableCardinality(double selectivityFactor) {
         // some code goes here
-        return 0;
+        return (int) Math.ceil(m_numTuples*selectivityFactor);
     }
 
     /**
@@ -148,7 +244,21 @@ public class TableStats {
      */
     public double estimateSelectivity(int field, Predicate.Op op, Field constant) {
         // some code goes here
-        return 1.0;
+        if (m_td.getFieldType(field) == Type.INT_TYPE) 
+        {
+            int val = ((IntField) constant).getValue();
+            IntHistogram hist = (IntHistogram) m_histograms.get(m_td.getFieldName(field));
+
+            return hist.estimateSelectivity(op, val);
+        } 
+        else 
+        {
+            String val = ((StringField) constant).getValue();
+            StringHistogram hist = (StringHistogram) m_histograms.get(m_td.getFieldName(field));
+
+            return hist.estimateSelectivity(op, val);
+        }
+
     }
 
     /**
@@ -156,7 +266,7 @@ public class TableStats {
      * */
     public int totalTuples() {
         // some code goes here
-        return 0;
+        return m_numTuples;
     }
 
 }
