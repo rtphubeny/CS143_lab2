@@ -83,20 +83,9 @@ public class IntHistogram {
         int index = bucketIndex(v);
         double estTuples = 0.0;
 
-        if (op == Op.EQUALS)
+        if (op == Op.EQUALS || Op.NOT_EQUALS)
         {
-            if (v >= m_min || v <= m_max)
-                estTuples = (double) (m_histogram[index]/m_bucketSize)/m_numTuples;
-
-            //return estTuples;
-
-            /*if (v<min || v>max) {
-            return 0.0;
-        } else {
-            height = histogram[bucketIndex];
-                return (double)(height/width)/ntups;
-        }*/
-            /*for(int i = 0; i < m_numBuckets; i++) 
+            for(int i = 0; i < m_numBuckets; i++) 
             {
                 if((v < (m_min + (i+1) * m_bucketSize)) && (v >= (m_min + i * m_bucketSize))) 
                 {
@@ -108,16 +97,7 @@ public class IntHistogram {
                 }
             }
 
-            return estTuples;*/
-        }
-
-        if (op == Op.NOT_EQUALS)
-        {
-            if (v >= m_min || v <= m_max)
-                estTuples = 1 - (double) (m_histogram[index]/m_bucketSize)/m_numTuples;
-
             //return estTuples;
-
         }
 
         if (op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQ)
