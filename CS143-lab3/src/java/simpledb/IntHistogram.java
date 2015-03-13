@@ -31,7 +31,7 @@ public class IntHistogram {
         this.m_max = max;
         this.m_numBuckets = buckets;
         m_histogram = new int[buckets];
-        m_bucketSize = (int) Math.ceil((double)((max - min +1)/buckets));
+        m_bucketSize = (int) Math.ceil( (double)( (max - min +1)/buckets) );
         m_numTuples = 0;
         // some code goes here
     }
@@ -160,7 +160,6 @@ public class IntHistogram {
      */
     public String toString() {
         // some code goes here
-        return String.format("min=%d, max=%d, bucketSize=%d, bucketNum=%d, numberOfTuples=%d\n",
-                             m_min, m_max, m_bucketSize, m_histogram.length, m _numTuples);
+        return String.format("min=%d, max=%d, bucketSize=%d, bucketNum=%d, numberOfTuples=%d\n", m_min, m_max, m_bucketSize, m_histogram.length, m _numTuples);
     }
 }
