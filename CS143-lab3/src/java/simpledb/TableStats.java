@@ -72,9 +72,9 @@ public class TableStats {
     private TupleDesc m_td; //tuple descriptor
     private HeapFile m_file;
     
-    private HashMap<String, Object> m_histograms;
-    private HashMap<String, Integer> m_mins;
-    private HashMap<String, Integer> m_maxs;
+    private Object[] m_histograms;
+    //private HashMap<String, Integer> m_mins;
+    //private HashMap<String, Integer> m_maxs;
 
     /**
      * Create a new TableStats object, that keeps track of statistics on each
@@ -102,11 +102,78 @@ public class TableStats {
         m_td = m_file.getTupleDesc();
         m_numTuples = 0;
 
-        m_mins = new HashMap<String, Integer>();
-        m_maxs = new HashMap<String, Integer>();
-        m_histograms = new HashMap<String, Object>();
+        //m_mins = new HashMap<String, Integer>();
+        //m_maxs = new HashMap<String, Integer>();
+        m_histograms = new Object[m_td.numFields()];
+        boolean hasInt = false;
+        for (int i = 0; i < m_td.numFields(); i++) {
+            if (m_td.getFieldType(i) == Type.INT_TYPE) {
+                hasInt = true;
+            } else {
+                m_histograms[i] = new StringHistogram(NUM_HIST_BINS);
+            }
+        }
 
-        Transaction trans = new Transaction();
+        SeqScan scan = new SeqScan(new TransactionId(), tableid);
+
+        try {
+            // need a SeqScan to collect min & max of int field
+            if (hasIntField) {
+                int[] mins = new int[m_td.numFields()];
+                int[] maxs = new int[m_td.numFields()];
+                for (int i = 0; i < m_td.numFields(); i++) {
+                    mins[i] = Integer.MAX_VALUE;
+                    maxs[i] = Integer.MIN_VALUE;
+                }
+
+                scan.open();
+                while (scan.hasNext()) {
+                    Tuple tuple = scan.next();
+                    for (int i = 0; i < m_td.numFields(); i++) {
+                        if (m_td.getFieldType(i) == Type.INT_TYPE) {
+                            int val = ((IntField) tuple.getField(i)).getValue();
+                            if (mins[i] > val) {
+                                mins[i] = val;
+                            }
+                            if (maxs[i] < val) {
+                                maxs[i] = val;
+                            }
+                        }
+                    }
+                }
+                scan.close();
+
+                // init histogram for int field
+                for (int i = 0; i < m_td.numFields(); i++) {
+                    if (m_td.getFieldType(i) == Type.INT_TYPE) {
+                        m_histograms[i] = new IntHistogram(NUM_HIST_BINS, mins[i], maxs[i]);
+                    }
+                }
+            }
+
+            // add field value to its histogram
+            scan.open();
+            while (scan.hasNext()) {
+                Tuple tuple = scan.next();
+                m_numTuples++;
+                for (int i = 0; i < m_td.numFields(); i++) {
+                    if (m_td.getFieldType(i) == Type.INT_TYPE) {
+                        IntHistogram histogram = (IntHistogram) m_histograms[i];
+                        histogram.addValue(((IntField) tuple.getField(i)).getValue());
+                    } else {
+                        StringHistogram histogram = (StringHistogram) m_histograms[i];
+                        histogram.addValue(((StringField) tuple.getField(i)).getValue());
+                    }
+                }
+            }
+            scan.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("failed to scan for statistics collection", e);
+        }
+
+        /*Transaction trans = new Transaction();
         TransactionId transId = trans.getId();
         DbFileIterator it = m_file.iterator(transId);
 
@@ -182,7 +249,7 @@ public class TableStats {
         }
         catch (TransactionAbortedException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
     /**
@@ -246,6 +313,18 @@ public class TableStats {
      */
     public double estimateSelectivity(int field, Predicate.Op op, Field constant) {
         // some code goes here
+
+        if (m_td.getFieldType(field) == Type.INT_TYPE) {
+            int val = ((IntField) constant).getValue();
+            IntHistogram histogram = (IntHistogram) m_histograms[field];
+            return histogram.estimateSelectivity(op, val);
+
+        } else {
+            String val = ((StringField) constant).getValue();
+            StringHistogram histogram = (StringHistogram) m_histograms[field];
+            return histogram.estimateSelectivity(op, val);
+        }
+/*
         if (m_td.getFieldType(field) == Type.INT_TYPE) 
         {
             int val = ((IntField) constant).getValue();
@@ -260,7 +339,7 @@ public class TableStats {
 
             return hist.estimateSelectivity(op, val);
         }
-
+*/
     }
 
     /**
