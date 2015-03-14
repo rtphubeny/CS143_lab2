@@ -10,22 +10,70 @@ LAB 3 REPORT
 
 Parser.java -- Exercise 1
 
-Step 1: simpledb.Parser.main() and simpledb.Parser.start() simpledb.Parser.main() is the entry point for the SimpleDB system. It calls simpledb.Parser.start(). The latter performs three main actions:
-
-1. It populates the SimpleDB catalog from the catalog text file provided by the user as argument (Database.getCatalog().loadSchema(argv[0]);).
-2. For each table defined in the system catalog, it computes statistics over the data in the table by calling: TableStats.computeStatistics(), which then does: TableStats s = new TableStats(tableid, IOCOSTPERPAGE);
-3. It processes the statements submitted by the user (processNextStatement(new ByteArrayInputStream(statementBytes));)
+Step 1: simpledb.Parser.main() and simpledb.Parser.start()
+simpledb.Parser.main() is the entry point for the SimpleDB system. It calls
+simpledb.Parser.start(). The latter performs three main actions:
+1. It populates the SimpleDB catalog from the catalog text file provided
+by the user as argument (Database.getCatalog().loadSchema(argv[0]);).
+2. For each table defined in the system catalog, it computes statistics
+over the data in the table by calling: TableStats.computeStatistics(),
+which then does: TableStats s = new TableStats(tableid, IOCOSTPERPAGE);
+3. It processes the statements submitted by the user
+(processNextStatement(new ByteArrayInputStream(statementBytes));)
 
 Step 2: simpledb.Parser.processNextStatement() 
 This method takes two key actions:
-1. First, it gets a physical plan for the query by invoking handleQueryStatement((ZQuery)s);
+1. First, it gets a physical plan for the query by invoking
+handleQueryStatement((ZQuery)s);
 2. Then it executes the query by calling query.execute();
 
 Step 3: simpledb.Parser.handleQueryStatement() 
-1. First this function sets the query's logical and physical plans by LogicalPlan lp = parseQueryLogicalPlan(tId, s); and lp.physicalPlan(tId, TableStats.getStatsMap(), explain);. To find the physical plan it had to find the logical plan first, hence the lp.physicalPlan. Once found, the plans are set to that query.
-2. If there actually is a physical plan, it gets the method to update the Operator Cardinality. It then invokes this method, as seen in m.invoke(null, (Operator) physicalPlan, lp.getTableAliasToIdMapping(), TableStats.getStatsMap());
+1. First this function sets the query's logical and physical plans by
+LogicalPlan lp = parseQueryLogicalPlan(tId, s);
+and lp.physicalPlan(tId, TableStats.getStatsMap(), explain);.
+To find the physical plan it had to find the logical plan first, hence the
+lp.physicalPlan. Once found, the plans are set to that query.
+2. If there actually is a physical plan, it gets the method to update
+the Operator Cardinality. It then invokes this method, as seen in
+m.invoke(null, (Operator) physicalPlan, lp.getTableAliasToIdMapping(), TableStats.getStatsMap());
 
-Step 4:
+Step 4: simpledb.Parser.parseQueryLogicalPlan()
+1. First, it creates a Logical plan and sets it to the query.
+2. Then it walks through the tables in the FROM clause. Each table is added to be accessed
+by the plan.
+3. It looks at the where clause next, creating fliter and join nodes as needed by
+calling processExpression as processExpression(tid, wx, lp);
+4. If there is a group by expression, it saves the value.
+5. It walks through the select list. For each item in the select list, it picks out
+aggregates, and makes sure that the query is valid by checking that the expressions
+are supported, that the aggregates over multiple fields are supported, the group by
+list contains a non-aggregate. It records the appropriate fields and aggregates.
+6. If the query specifies the order, it will plan to sort the data as long as the
+order does not have attributes and is not complex.
+
+Step 5: simpledb.Parser.processExpression() 
+1. If the expression's operator is an AND, it calls processExpression for
+each operand.
+2. If the expression's operator is an OR, it throws an exception because
+they are unsupported.
+3. Otherwise, the expression is a binary expression with the form 'A op B'.
+4. If the operands are both constants and they are both column names,
+it will create a join node. It will also create a join node if either operand
+is a query. Otherwise, it creates a select node.
+5. To create a join node when the right operand is a nested query, it will
+generate a plan with the right operator with
+LogicalPlan sublp = parseQueryLogicalPlan(tid, (ZQuery) ops.elementAt(1));
+It then adds a join to the logical plan using an iterator of the subplan
+as shown with
+lp.addJoin(tab1field, pp, op);.
+6. To create a join node when neither the right or left operands are
+nested queries (We assume that the left operand cannot be a nested query.),
+it will add a join to the logical plan using the values of each operand in
+lp.addJoin(tab1field, tab2field, op);.
+7. To create a select node, it adds a filter to the logical plan with the
+appropriate column value, operator, and constant to compare against.
+
+
 
 The implementation of IntHistogram.java was not overwhelmingly difficult, 
 but it did cause a few headaches with how specific it was. The size of a 
@@ -73,6 +121,7 @@ makes use of dynamic programming to calculate the optimal order of
 smaller subsets, increasing the size of the subsets until we find the
 optimal order.
 
+Query Plans -- Exercise 6
 Exercise 6 required us to run the query:
 	select d.fname, d.lname
 	from Actor a, Casts c, Movie_Director m, Director d
@@ -131,6 +180,8 @@ with a because it is the fastest way to form a joined table of m, c, and a.
 g is joined next because it is the fastest estimated way to form a joined
 table of m, c, a, and d. The optimizer used dynamic programming to find
 each best plan.
+
+
 
 This lab took us a bit longer than the other two labs, as the concepts in 
 this lab are much more advanced. The detailed nature of this lab, such as 
