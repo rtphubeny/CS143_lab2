@@ -8,7 +8,24 @@ Slip Time:
 
 LAB 3 REPORT
 
-Parser.java
+Parser.java -- Exercise 1
+
+Step 1: simpledb.Parser.main() and simpledb.Parser.start() simpledb.Parser.main() is the entry point for the SimpleDB system. It calls simpledb.Parser.start(). The latter performs three main actions:
+
+1. It populates the SimpleDB catalog from the catalog text file provided by the user as argument (Database.getCatalog().loadSchema(argv[0]);).
+2. For each table defined in the system catalog, it computes statistics over the data in the table by calling: TableStats.computeStatistics(), which then does: TableStats s = new TableStats(tableid, IOCOSTPERPAGE);
+3. It processes the statements submitted by the user (processNextStatement(new ByteArrayInputStream(statementBytes));)
+
+Step 2: simpledb.Parser.processNextStatement() 
+This method takes two key actions:
+1. First, it gets a physical plan for the query by invoking handleQueryStatement((ZQuery)s);
+2. Then it executes the query by calling query.execute();
+
+Step 3: simpledb.Parser.handleQueryStatement() 
+1. First this function sets the query's logical and physical plans by LogicalPlan lp = parseQueryLogicalPlan(tId, s); and lp.physicalPlan(tId, TableStats.getStatsMap(), explain);. To find the physical plan it had to find the logical plan first, hence the lp.physicalPlan. Once found, the plans are set to that query.
+2. If there actually is a physical plan, it gets the method to update the Operator Cardinality. It then invokes this method, as seen in m.invoke(null, (Operator) physicalPlan, lp.getTableAliasToIdMapping(), TableStats.getStatsMap());
+
+Step 4:
 
 The implementation of IntHistogram.java was not overwhelmingly difficult, 
 but it did cause a few headaches with how specific it was. The size of a 

@@ -150,6 +150,14 @@ public class IntHistogram {
             }
         }
 
+        if (op == Op.LIKE) 
+        {
+            if (v < m_min || v > m_max)
+                return 0.0;
+            else 
+                estTuples = (double) m_histogram[index]/(double) m_bucketSize;
+        }
+
     	// some code goes here
         return estTuples / m_numTuples;
         //return the estimated tuples divided by the number of tuples
